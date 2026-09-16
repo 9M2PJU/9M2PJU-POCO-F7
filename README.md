@@ -931,7 +931,7 @@ Pre-compiles all installed system and user packages into native ARM64 instructio
 ### 7. Restrict background execution on heavy apps
 
 ```bash
-# Deny persistent background execution for RAM-hungry social/media apps
+# Deny persistent background execution for RAM-hungry social, payment, and shopping apps
 adb shell appops set com.facebook.katana RUN_IN_BACKGROUND deny
 adb shell appops set com.facebook.katana RUN_ANY_IN_BACKGROUND deny
 adb shell appops set com.lemon.lvoverseas RUN_IN_BACKGROUND deny
@@ -940,14 +940,26 @@ adb shell appops set com.tranzmate RUN_IN_BACKGROUND deny
 adb shell appops set com.tranzmate RUN_ANY_IN_BACKGROUND deny
 adb shell appops set my.com.tngdigital.ewallet RUN_IN_BACKGROUND deny
 adb shell appops set my.com.tngdigital.ewallet RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.shopeepay.my RUN_IN_BACKGROUND deny
+adb shell appops set com.shopeepay.my RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.shopee.my RUN_IN_BACKGROUND deny
+adb shell appops set com.shopee.my RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.ss.android.ugc.trill RUN_IN_BACKGROUND deny
+adb shell appops set com.ss.android.ugc.trill RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.alibaba.aliexpresshd RUN_IN_BACKGROUND deny
+adb shell appops set com.alibaba.aliexpresshd RUN_ANY_IN_BACKGROUND deny
 
 # Force stop to free RAM immediately
 adb shell am force-stop com.facebook.katana
 adb shell am force-stop com.lemon.lvoverseas
 adb shell am force-stop com.tranzmate
 adb shell am force-stop my.com.tngdigital.ewallet
+adb shell am force-stop com.shopeepay.my
+adb shell am force-stop com.shopee.my
+adb shell am force-stop com.ss.android.ugc.trill
+adb shell am force-stop com.alibaba.aliexpresshd
 ```
-Frees **~900 MB of RAM** from persistent background caching.
+Frees **~1.2 GB of RAM** from persistent background caching.
 
 ### 8. Storage TRIM (Garbage Collection)
 
