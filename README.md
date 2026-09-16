@@ -927,8 +927,11 @@ adb shell settings put global wifi_scan_throttle_enabled 1
 adb shell settings put global wifi_scan_always_enabled 0
 adb shell settings put global ble_scan_always_enabled 0
 adb shell settings put global wifi_wakeup_enabled 0
+
+# Disable cellular high-power data transmission while connected to Wi-Fi
+adb shell settings put global mobile_data_always_on 0
 ```
-Stops the OS and Google Location Services from constantly waking up radio hardware when idle.
+Stops the OS, cellular modem, and Google Location Services from constantly waking up radio hardware and maintaining active LTE/5G PDP channels when connected to home Wi-Fi.
 
 ### 6. Ahead-of-Time (AOT) ART bytecode compilation
 

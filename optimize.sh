@@ -191,6 +191,7 @@ apply_settings() {
     adb_cmd "settings put global wifi_scan_always_enabled 0"
     adb_cmd "settings put global ble_scan_always_enabled 0"
     adb_cmd "settings put global wifi_wakeup_enabled 0"
+    adb_cmd "settings put global mobile_data_always_on 0"
 
     echo -e "${C_GREEN}  Done: Performance settings applied.${C_RESET}"
 }
