@@ -246,32 +246,36 @@ After B1-4  ██████████████████████�
 After B5    █████████████████████████████████████     384
 After B6    █████████████████████████████████████     379
 After B7    █████████████████████████████████████     378
-                                                 (-27 total)
+After B8    ████████████████████████████████████      374
+After B9    ███████████████████████████████████       368
+After B10   ██████████████████████████████████        365
+                                                 (-40 total)
 ```
 
-**Removed packages by category (27 total)**
+**Removed packages by category (40 total)**
 
 ```mermaid
 pie showData
-    title "Removed packages by category (27 total)"
-    "Xiaomi duplicate apps" : 9
-    "Google + Xiaomi extra" : 5
-    "Ad / telemetry" : 4
+    title "Removed packages by category (40 total)"
+    "Xiaomi duplicate & unused apps" : 15
+    "Google optional bloat" : 8
+    "Ad / telemetry SDKs" : 5
+    "OEM / Vendor preloads" : 4
     "Meta background services" : 3
     "Microsoft Link to Windows" : 3
     "Xiaomi drawer + minus screen" : 2
-    "Chinese biometric auth" : 1
 ```
 
 **Background services / SDKs removed**
 
 ```
-Telemetry             █████       5
+Telemetry & AI        ██████      6
 Meta tracking         ███         3
 Microsoft             ███         3
-Ad SDKs (MSA)         █           1
-GetApps auto-install  █           1
-                                  (13 always-running services gone)
+Ad SDKs (MSA/Glance)  ██          2
+OEM carrier/store     ██          2
+Xiaomi Smart Hub      ██          2
+                                  (18 always-running services gone)
 ```
 
 **RAM freed by batch (when those processes were running)**
@@ -284,36 +288,39 @@ B4 MS          █████              40 MB
 B5 drawer      ██                 15 MB
 B6 Google      █████████████████ 130 MB
 B7 SOTER       █                   6 MB
-                                   (~451 MB when all were running)
+B8 OEM/Vendor  ███████            50 MB
+B9 Xiaomi Eco  ████████████████████████████████ 300 MB
+B10 Google TV  █████              40 MB
+                                  (~841 MB peak RAM freed)
 ```
 
-> Batch 6 is the biggest single win because Google Duo/Meet (83 MB), Digital Wellbeing (37 MB), and MiSightService (10 MB) were all actively running. Batches 1-5 freed RAM too, but those processes were often idle - the real win is they no longer wake up at all.
+> Batch 9 is a massive RAM win because Mi Link (`milink.service:core` + `milink.service:ui`) consumed ~280 MB of persistent background RAM alone. Batch 6 and Batch 8 removed active background services and lockscreen advertising.
 
 **Free RAM: stock vs after (typical idle)**
 
 ```
 Stock           ███████████████  5.5 GB
-After debloat   ██████████████   5.4 GB
+After debloat   ████████████████████  7.4 GB
 ```
 
-> Free RAM numbers look similar because Android aggressively caches background processes. The real difference is *what* is using the RAM: stock has 27 bloat processes cached; after debloat those slots are taken by apps you actually use, or stay genuinely free.
+> Real measured available RAM increased to ~7.4 GB after debloating 40 packages, compiling ART bytecode, and denying background running on heavy social media apps.
 
 **Current top RAM users (after debloat, measured live)**
 
 ```
-system_server   ████████████████████████████████████████  799 MB
-SystemUI        ███████████████████████████████           579 MB
-Facebook        ███████████████████████                   416 MB
-Instagram       ██████████████████████                    394 MB
-GMS             █████████████████████                     384 MB
-GMS.persist     ███████████████████                       353 MB
-Settings        █████████████████                         306 MB
-Gmail           ██████████████                            269 MB
-Gboard          █████████████                             263 MB
-Nova            █████████████                             258 MB
+system_server   ████████████████████████████████████████  770 MB
+TnG eWallet     ██████████████████████████████            614 MB
+SystemUI        ███████████████████████████               582 MB
+GMS             ███████████████████                       393 MB
+Settings        ███████████████                           313 MB
+WhatsApp        ██████████████                            292 MB
+Google TTS      █████████████                             270 MB
+Gmail           █████████████                             265 MB
+POCO Launcher   █████████████                             261 MB
+Gboard          ████████████                              250 MB
 ```
 
-> None of the top RAM consumers are bloat - they are either system processes (system_server, SystemUI, GMS, Settings, Gboard) or apps the author actively uses (Facebook, Instagram, Gmail, Nova Launcher). Before debloat, MSA / Joyose / Meta services / Microsoft services / Duo would have appeared in this list.
+> None of the top RAM consumers are bloat - they are either core system services or apps the author actively uses (TnG eWallet, WhatsApp, Gmail, Gboard, POCO Launcher). Before debloat, MSA / Joyose / Meta services / Microsoft services / Mi Link / Duo would have clogged this list.
 
 **CPU usage: stock vs after (system_server, idle)**
 
