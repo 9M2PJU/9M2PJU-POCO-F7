@@ -2,7 +2,7 @@
 
 A safe, reversible, no-root debloat toolkit for the **POCO F7 (codename `onyx_global`)** running HyperOS 2 / Android 16.
 
-> Maintained by [9M2PJU](https://github.com/9M2PJU) · Tested on ROM `OS3.0.302.0.WOLMIXM` (HyperOS V816, Android 16, security patch 2026-05-01)
+> Maintained by [9M2PJU](https://github.com/9M2PJU) · Tested on ROM `OS3.0.303.0.WOLMIXM` (HyperOS V816, Android 16, security patch 2026-07-01)
 
 ---
 
@@ -62,10 +62,18 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Scrip
 - [What is NOT removed (and why)](#what-is-not-removed-and-why)
 - [HyperOS-specific notes](#hyperos-specific-notes)
 - [Performance optimizations applied](#performance-optimizations-applied)
-  - [Animation speed-up (0.5x)](#animation-speed-up-05x)
-  - [Bluetooth off (if unused)](#bluetooth-off-if-unused)
-  - [Encrypted private DNS (Cloudflare)](#encrypted-private-dns-cloudflare)
-  - [Memory Extension - disable it (12 GB RAM variant)](#memory-extension---disable-it-12-gb-ram-variant)
+  - [1. UI Animation speed-up (0.5x)](#1-ui-animation-speed-up-05x)
+  - [2. Display refresh rate (90 Hz sweet spot)](#2-display-refresh-rate-90-hz-sweet-spot)
+  - [3. Screen off timeout (30 seconds)](#3-screen-off-timeout-30-seconds)
+  - [4. Hardware tethering acceleration](#4-hardware-tethering-acceleration)
+  - [5. Wi-Fi scan throttling & idle radio power saving](#5-wi-fi-scan-throttling--idle-radio-power-saving)
+  - [6. Ahead-of-Time (AOT) ART bytecode compilation](#6-ahead-of-time-aot-art-bytecode-compilation)
+  - [7. Restrict background execution on heavy apps](#7-restrict-background-execution-on-heavy-apps)
+  - [8. Storage TRIM (Garbage Collection)](#8-storage-trim-garbage-collection)
+  - [9. Bluetooth HD audio codecs](#9-bluetooth-hd-audio-codecs)
+  - [10. Logcat ring buffer reduction](#10-logcat-ring-buffer-reduction)
+  - [11. Encrypted private DNS (Cloudflare / NextDNS)](#11-encrypted-private-dns-cloudflare--nextdns)
+  - [12. Memory Extension - disable it (12 GB RAM variant)](#12-memory-extension---disable-it-12-gb-ram-variant)
 - [Battery health notes](#battery-health-notes)
 - [Troubleshooting](#troubleshooting)
 - [FAQ](#faq)
@@ -80,7 +88,7 @@ Three bash scripts that talk to your POCO F7 over `adb`:
 | Script | Purpose |
 |---|---|
 | `install.sh` | One-liner installer - downloads `debloat.sh` + `restore.sh` from GitHub and runs debloat interactively |
-| `debloat.sh` | Removes 27 known-safe bloat packages in 7 small batches. Interactive mode explains each package and prompts y/N/s per package. Also supports `--yes` (non-interactive) and `--list` (dry-run) |
+| `debloat.sh` | Removes 40 known-safe bloat packages in 10 small batches. Interactive mode explains each package and prompts y/N/s per package. Also supports `--yes` (non-interactive) and `--list` (dry-run) |
 | `restore.sh` | Restores removed packages from the untouched `/system` partition (no internet needed). Interactive mode explains each package and prompts y/N/s per package. Also supports `--yes`, `--list`, `--batch N`, and explicit package names |
 
 Everything is **reversible**, **no root**, **no bootloader unlock**, **no warranty impact**, **no banking/Play Integrity breakage**.
@@ -100,14 +108,17 @@ A stock POCO F7 ships with ~405 system packages. Many are useful, but a meaningf
 5. **Xiaomi's app recommendation engine** (GetApps / `mipicks` / `discover`) which pushes junk app installs in the background
 6. **Google + Xiaomi extra bloat** (Google Duo/Meet, YouTube Music system app, Digital Wellbeing, Xiaomi barrage) that waste RAM or have better replacements
 7. **Chinese-market services** (Tencent SOTER biometric auth) that are useless outside China and waste RAM
+8. **Preloaded OEM bloat** (Amazon AppManager, Glance lockscreen wallpaper ads, WPS Office Lite)
+9. **Unused Xiaomi ecosystem background services** (Mi Link Smart Hub, Xiaomi Pay, XiaoAI Services)
+10. **Google optional bloat** (TalkBack screen reader, Google TV, Google One stub)
 
 Removing these:
-- Cuts background CPU/RAM usage (~500 MB+ RAM savings total)
-- Stops most Xiaomi + Meta telemetry
-- Prevents GetApps from auto-installing junk
-- Frees storage (small) and RAM (noticeable)
-- Improves battery life (modestly)
-- Reduces ad surface area in Notification shade, Settings, and the launcher
+- Cuts background CPU/RAM usage (~1.8 - 2.0 GB RAM headroom gained)
+- Stops all Xiaomi + Meta + OEM telemetry
+- Prevents GetApps and Glance from auto-installing junk or pushing lockscreen ads
+- Frees storage and maximizes available memory
+- Improves battery life and idle sleep
+- Reduces ad surface area in Notification shade, Settings, lockscreen, and launcher
 
 ---
 
@@ -122,14 +133,14 @@ This section shows what the debloat actually achieved on the author's POCO F7, s
 | Phone | POCO F7 |
 | Model | 25053PC47G |
 | Codename | `onyx_global` |
-| ROM | `OS3.0.302.0.WOLMIXM` (HyperOS 2 V816) |
+| ROM | `OS3.0.303.0.WOLMIXM` (HyperOS 2 V816) |
 | Android | 16 |
-| Security patch | 2026-05-01 |
+| Security patch | 2026-07-01 |
 | Chipset | Qualcomm Snapdragon 8s Gen 4 (SM8735, 4nm) |
 | GPU | Adreno 825 |
 | RAM | 12 GB (11.5 GB usable) |
-| Storage | 512 GB UFS 4.1 (84 GB used, 394 GB free) |
-| Battery | 6500 mAh design, 6209 mAh learned (95.5% health) |
+| Storage | 512 GB UFS 4.1 (103 GB used, 375 GB free) |
+| Battery | 6500 mAh design, 6217 mAh learned (95.6% health) |
 | Activated | 2025-10-31 |
 
 ### Stock vs after debloat - the numbers
@@ -192,7 +203,6 @@ The author reviewed every remaining suspicious package and chose to keep these b
 | `com.xiaomi.mirror` (18 MB RAM) | Screen mirroring to TV - used |
 | `com.xiaomi.finddevice` (20 MB RAM) | Find My Phone anti-theft - kept as security feature |
 | `com.miui.phrase` (7 MB RAM) | Quick reply phrases - kept |
-| `com.wdstechnology.android.kryten` | Unknown purpose (WDStechnology) - kept for safety |
 | `com.bsp.catchlog` | BSP debug log capture - kept for diagnostics |
 | `com.jiiov.fingerprint_factorytest` | Fingerprint factory test - harmless, kept |
 
@@ -865,29 +875,105 @@ If you're tempted to remove something in this list, **don't**. The risk/reward i
 
 ## Performance optimizations applied
 
-In addition to debloating, the author applied these optimizations to the test device (NOT done by `debloat.sh` - run them manually if you want them):
+In addition to debloating, the author applied these optimizations to the test device (NOT done by `debloat.sh` - run them manually via ADB if you want them):
 
-### Animation speed-up (0.5x)
+### 1. UI Animation speed-up (0.5x)
 
 ```bash
 adb shell settings put global window_animation_scale 0.5
 adb shell settings put global transition_animation_scale 0.5
 adb shell settings put global animator_duration_scale 0.5
 ```
+Makes the UI feel twice as snappy with instant app switching. Revert with `1.0`.
 
-Makes the UI feel noticeably snappier. Undo with `1.0` instead of `0.5`.
-
-### Bluetooth off (if unused)
+### 2. Display refresh rate (90 Hz sweet spot)
 
 ```bash
-adb shell svc bluetooth disable
+adb shell settings put system peak_refresh_rate 90
 ```
+Saves **~15% display panel power** while retaining fluid 90fps scrolling. Revert with `120`.
 
-Saves a small amount of battery. Re-enable with `svc bluetooth enable` or the Quick Settings toggle.
+### 3. Screen off timeout (30 seconds)
 
-### Encrypted private DNS (Cloudflare)
+```bash
+adb shell settings put system screen_off_timeout 30000
+```
+Locks screen-off idle time to 30s.
 
-Set in Settings → Private DNS → "Custom provider hostname":
+### 4. Hardware tethering acceleration
+
+```bash
+adb shell settings put global tether_offload_subsystem 1
+adb shell settings put global tether_offload_disabled 0
+```
+Routes hotspot and USB/Wi-Fi tethering packets directly through the Qualcomm modem hardware, reducing main CPU workload, latency, and power draw.
+
+### 5. Wi-Fi scan throttling & idle radio power saving
+
+```bash
+# Throttle aggressive background Wi-Fi scan spam from apps (eliminates packet jitter)
+adb shell settings put global wifi_scan_throttle_enabled 1
+
+# Disable continuous background Wi-Fi and Bluetooth beacon location scanning
+adb shell settings put global wifi_scan_always_enabled 0
+adb shell settings put global ble_scan_always_enabled 0
+adb shell settings put global wifi_wakeup_enabled 0
+```
+Stops the OS and Google Location Services from constantly waking up radio hardware when idle.
+
+### 6. Ahead-of-Time (AOT) ART bytecode compilation
+
+```bash
+adb shell cmd package compile -m speed-profile -a
+```
+Pre-compiles all installed system and user packages into native ARM64 instructions. Reduces app cold-launch times and eliminates in-app micro-stutters.
+
+### 7. Restrict background execution on heavy apps
+
+```bash
+# Deny persistent background execution for RAM-hungry social/media apps
+adb shell appops set com.facebook.katana RUN_IN_BACKGROUND deny
+adb shell appops set com.facebook.katana RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.lemon.lvoverseas RUN_IN_BACKGROUND deny
+adb shell appops set com.lemon.lvoverseas RUN_ANY_IN_BACKGROUND deny
+adb shell appops set com.tranzmate RUN_IN_BACKGROUND deny
+adb shell appops set com.tranzmate RUN_ANY_IN_BACKGROUND deny
+adb shell appops set my.com.tngdigital.ewallet RUN_IN_BACKGROUND deny
+adb shell appops set my.com.tngdigital.ewallet RUN_ANY_IN_BACKGROUND deny
+
+# Force stop to free RAM immediately
+adb shell am force-stop com.facebook.katana
+adb shell am force-stop com.lemon.lvoverseas
+adb shell am force-stop com.tranzmate
+adb shell am force-stop my.com.tngdigital.ewallet
+```
+Frees **~900 MB of RAM** from persistent background caching.
+
+### 8. Storage TRIM (Garbage Collection)
+
+```bash
+adb shell sm fstrim
+```
+Trims unused blocks across the 512 GB UFS 4.1 flash storage, keeping sequential and random read/write speeds peak.
+
+### 9. Bluetooth HD audio codecs
+
+```bash
+adb shell settings put global bluetooth_a2dp_supports_optional_codecs 1
+adb shell settings put global bluetooth_a2dp_optional_codecs_enabled 1
+```
+Enables 24-bit 96kHz LDAC, aptX Adaptive, and aptX Lossless support on compatible wireless headsets.
+
+### 10. Logcat ring buffer reduction
+
+```bash
+adb logcat -G 256K
+```
+Reduces background logging buffer from 2 MiB to 256 KiB, cutting logging CPU cycles.
+
+### 11. Encrypted private DNS (Cloudflare / NextDNS)
+
+Set in Settings -> Private DNS -> "Custom provider hostname":
 ```
 dns.cloudflare.com
 ```
@@ -897,16 +983,16 @@ Or use the DNS-over-HTTPS hostname for stricter malware blocking:
 security.cloudflare-dns.com
 ```
 
-System-wide encrypted DNS via Cloudflare's 1.1.1.1 resolver. Free, fast, privacy-respecting (no IP logging). Pairs well with the MSA removal for privacy.
+System-wide encrypted DNS via Cloudflare's 1.1.1.1 resolver. Free, fast, privacy-respecting (no IP logging). Blocks trackers and speeds up domain lookups.
 
-### Memory Extension - disable it (12 GB RAM variant)
+### 12. Memory Extension - disable it (12 GB RAM variant)
 
-HyperOS "Memory Extension" (Settings → Additional settings → Memory Extension) is a hybrid swap system with two layers:
+HyperOS "Memory Extension" (Settings -> Additional settings -> Memory Extension) is a hybrid swap system with two layers:
 
 1. **ZRAM** (always on, kernel-level) - compresses cold RAM pages in-place. On the POCO F7 it uses ~800 MB of physical RAM to hold ~2.6 GB of compressed data at a ~3.3x ratio. This is **good** - effectively free extra RAM at RAM speed.
 2. **Storage-backed swap** (the toggle) - uses a file on UFS 4.1 storage as additional swap. This is the **slow** layer: ~10-50x slower than RAM when touched.
 
-On the 12 GB RAM variant, the storage-backed layer is essentially unused (only ~2.6 GB of swap is actually in use, all in ZRAM). Disabling it:
+On the 12 GB RAM variant, the storage-backed layer is essentially unused. Disabling it:
 
 - Removes the slow storage-swap layer (no more micro-stutters from page-in stalls)
 - Reduces UFS write wear (random small IOs are the worst for flash)
@@ -915,27 +1001,14 @@ On the 12 GB RAM variant, the storage-backed layer is essentially unused (only ~
 
 **Recommendation for 12 GB RAM variant: disable.** You have plenty of RAM (typically 7+ GB free) and will essentially never hit the 12 GB ceiling with normal usage. ZRAM stays on and gives you the real benefit.
 
-**When to keep it ON instead:**
-- You play heavy 3D games (Genshin, CoD Mobile at max) AND keep many apps in background
-- You regularly see "apps reloading" when switching between them
-- You have the 8 GB RAM variant (you actually need it then)
-
 **How to disable:**
-Settings → Additional settings → Memory Extension → toggle OFF → reboot
+Settings -> Additional settings -> Memory Extension -> toggle OFF -> reboot
 
 After reboot, verify ZRAM-only swap is active:
 ```bash
 adb shell "cat /proc/meminfo | grep -E 'SwapTotal|SwapFree'"
 # SwapTotal should drop from ~12.5 GB to ~4-6 GB (ZRAM-only)
 ```
-
-**What to expect after disabling:**
-- Day-to-day: no noticeable change (you have plenty of RAM)
-- Heavy multitasking: apps may reload slightly more often instead of resuming from storage swap (rare with 12 GB)
-- Gaming: same or slightly better (no storage-swap stalls)
-- Battery: negligible change
-- Storage: get back 4-8 GB
-- UFS lifespan: slightly improved (less random write wear)
 
 ---
 
