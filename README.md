@@ -400,6 +400,7 @@ This is the safest possible debloat method. The riskier alternatives (root + `/s
 ├── install.sh                          # One-liner installer (downloads + runs)
 ├── debloat.sh                          # Main debloat script (executable)
 ├── restore.sh                          # Restore script (executable)
+├── optimize.sh                         # Health check & performance maintenance script
 ├── README.md                           # This file
 └── backup/                             # Snapshot of the author's debloat session
     ├── build_info.txt                  # ROM fingerprint, HyperOS version, security patch
@@ -875,7 +876,15 @@ If you're tempted to remove something in this list, **don't**. The risk/reward i
 
 ## Performance optimizations applied
 
-In addition to debloating, the author applied these optimizations to the test device (NOT done by `debloat.sh` - run them manually via ADB if you want them):
+In addition to debloating, the author applied these optimizations to the test device. You can run all of them automatically using the bundled **`optimize.sh`** maintenance script, or execute them manually via ADB:
+
+```bash
+# Run the automated health check and optimization suite
+bash optimize.sh
+
+# Or run non-interactively
+bash optimize.sh --yes
+```
 
 ### 1. UI Animation speed-up (0.5x)
 
@@ -1021,6 +1030,26 @@ After reboot, verify ZRAM-only swap is active:
 adb shell "cat /proc/meminfo | grep -E 'SwapTotal|SwapFree'"
 # SwapTotal should drop from ~12.5 GB to ~4-6 GB (ZRAM-only)
 ```
+
+### 13. System sound & audio DSP wakeups suppression
+
+```bash
+adb shell settings put system sound_effects_enabled 0
+adb shell settings put system lockscreen_sounds_enabled 0
+adb shell settings put system dtmf_tone 0
+adb shell settings put global power_sounds_enabled 0
+adb shell settings put global charging_sounds_enabled 0
+adb shell settings put system charging_sounds_enabled 0
+adb shell settings put secure charging_sounds_enabled 0
+```
+Disables unnecessary UI clicks, tap sounds, dialpad tones, and charger chimes, preventing the audio DSP and sound daemon from waking up on every touch.
+
+### 14. Automatic Battery Saver Trigger (15%)
+
+```bash
+adb shell settings put global low_power_trigger_level 15
+```
+Automatically engages Android's low-power profile at 15% remaining battery rather than waiting for 5% or 10%.
 
 ---
 
