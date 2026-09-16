@@ -74,6 +74,10 @@ PKG_META=(
   "com.miui.misightservice|Xiaomi MiSight (insights/telemetry)|Xiaomi's insights and telemetry service. Collects device health, feature usage, system metrics. Phones home. Uses ~10 MB RAM.|Was removed: telemetry; ~10 MB RAM.|Restoring re-enables another telemetry channel to Xiaomi."
   "com.xiaomi.barrage|Xiaomi Barrage (bullet comments)|Danmaku-style floating bullet comments overlay for videos. Chinese market feature. Useless outside China.|Was removed: Chinese-market feature, useless outside China.|Restoring brings back the bullet comments feature. Only useful if you watch Chinese video platforms."
   "com.tencent.soter.soterserver|Tencent SOTER (biometric auth server)|Tencent's SOTER biometric authentication server. Chinese standard for fingerprint/face login in WeChat, QQ, Tencent games, some banking apps. Uses ~6 MB RAM.|Was removed: Chinese biometric auth for WeChat/QQ; useless outside China; ~6 MB RAM.|Restoring re-enables biometric auth for Chinese apps. Only needed if you use WeChat/QQ/Chinese banking apps with fingerprint login."
+  "com.amazon.appmanager|Amazon AppManager|Preloaded Amazon background agent. Runs background checks and telemetry.|Was removed: Amazon background tracking and diagnostic agent.|Restoring re-enables Amazon background service."
+  "com.miui.android.fashiongallery|Wallpaper Carousel (Glance)|Preinstalled lockscreen wallpaper carousel that displays dynamic ads, sponsored stories, and feeds.|Was removed: lockscreen ads and background network drain.|Restoring re-enables Wallpaper Carousel and dynamic lockscreen stories."
+  "cn.wps.xiaomi.abroad.lite|WPS Office Lite (Xiaomi)|Preinstalled third-party office document viewer with built-in ads.|Was removed: replaced by Microsoft Word/other; ad-supported bloat.|Restoring brings back WPS Office Lite."
+  "com.wdstechnology.android.kryten|WDS Kryten|Carrier diagnostic and APN provisioning background service.|Was removed: unneeded carrier provisioning agent.|Restoring re-enables the WDS Kryten service."
 )
 
 # ---------- Look up metadata for a package ----------

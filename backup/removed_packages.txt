@@ -50,3 +50,9 @@ com.xiaomi.barrage
 
 # 2026-07-26 - Batch 7: Chinese biometric auth (Tencent SOTER)
 com.tencent.soter.soterserver
+
+# 2026-09-16 - Batch 8: Preloaded OEM / Vendor bloat
+com.amazon.appmanager
+com.miui.android.fashiongallery
+cn.wps.xiaomi.abroad.lite
+com.wdstechnology.android.kryten

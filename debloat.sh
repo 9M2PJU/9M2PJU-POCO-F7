@@ -9,7 +9,7 @@
 #   bash debloat.sh             # interactive (explains + prompts per package)
 #   bash debloat.sh --yes       # non-interactive, removes all batches
 #   bash debloat.sh --list      # only list what would be removed, do nothing
-#   bash debloat.sh --batch 2   # only run batch N (1-7)
+#   bash debloat.sh --batch 2   # only run batch N (1-8)
 #
 # Each removed package is appended to removed_packages.txt in the same
 # folder as this script. Pair with restore.sh to undo.
@@ -267,6 +267,13 @@ BATCH7=(
   "com.tencent.soter.soterserver|Tencent SOTER (biometric auth server)|Tencent's SOTER (Secure Open Standard for Trusted Environment Recognition) biometric authentication server. Chinese industry standard for fingerprint/face login in apps like WeChat, QQ, Tencent games, and some banking apps. Uses ~6 MB RAM when running.|Chinese biometric auth standard for WeChat/QQ. Useless outside China unless you use Chinese apps with biometric login. Frees ~6 MB.|If you use WeChat, QQ, or Chinese banking apps with fingerprint login, do NOT remove this - those apps need it for biometric auth. Outside China and without those apps, it's safe to remove."
 )
 
+BATCH8=(
+  "com.amazon.appmanager|Amazon AppManager|Preloaded Amazon background agent. Runs background checks and telemetry even if you do not use Amazon apps.|Removes Amazon background tracking and diagnostic agent.|Safe to remove. No system functionality breaks."
+  "com.miui.android.fashiongallery|Wallpaper Carousel (Glance)|Preinstalled lockscreen wallpaper carousel that displays dynamic ads, sponsored stories, and online lockscreen feeds.|Removes lockscreen ads and background network drain.|Safe to remove. Normal static lockscreen wallpapers work fine."
+  "cn.wps.xiaomi.abroad.lite|WPS Office Lite (Xiaomi)|Preinstalled third-party office document viewer with built-in ads.|Replaced by Microsoft Word or other office apps. Removes third-party bloat with ads.|Safe to remove. Microsoft Word and other viewers handle documents normally."
+  "com.wdstechnology.android.kryten|WDS Kryten|Carrier diagnostic and APN provisioning background service.|Carrier provisioning agent not needed for standard cellular operation.|Safe to remove. Cellular voice, SMS, and data connectivity remain fully functional."
+)
+
 # ---------- Parse args ----------
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -318,13 +325,14 @@ run_one() {
   fi
 }
 
-run_one 1 "Ad/telemetry"                          "${BATCH1[@]}"
-run_one 2 "Xiaomi duplicate apps"                 "${BATCH2[@]}"
-run_one 3 "Meta services"                         "${BATCH3[@]}"
-run_one 4 "Microsoft Link to Windows"             "${BATCH4[@]}"
+run_one 1 "Ad/telemetry"                            "${BATCH1[@]}"
+run_one 2 "Xiaomi duplicate apps"                   "${BATCH2[@]}"
+run_one 3 "Meta services"                           "${BATCH3[@]}"
+run_one 4 "Microsoft Link to Windows"               "${BATCH4[@]}"
 run_one 5 "Xiaomi app drawer search + minus screen" "${BATCH5[@]}"
-run_one 6 "Google + Xiaomi extra bloat"           "${BATCH6[@]}"
-run_one 7 "Chinese biometric auth (Tencent SOTER)" "${BATCH7[@]}"
+run_one 6 "Google + Xiaomi extra bloat"             "${BATCH6[@]}"
+run_one 7 "Chinese biometric auth (Tencent SOTER)"  "${BATCH7[@]}"
+run_one 8 "Preloaded OEM / Vendor bloat"            "${BATCH8[@]}"
 
 if [ "$LIST_ONLY" = "1" ]; then
   echo "List-only mode - nothing was changed."

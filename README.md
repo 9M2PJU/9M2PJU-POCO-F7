@@ -25,10 +25,10 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Scrip
 # Download only, don't run yet (review the scripts first)
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --no-run
 
-# Non-interactive - remove all 7 batches without prompting
+# Non-interactive - remove all 8 batches without prompting
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --yes
 
-# Run only a specific batch (1-7)
+# Run only a specific batch (1-8)
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --batch 1
 
 # Install to a specific directory
@@ -134,22 +134,22 @@ This section shows what the debloat actually achieved on the author's POCO F7, s
 
 ### Stock vs after debloat - the numbers
 
-| Metric | Stock (out of the box) | After all 7 batches | Difference |
+| Metric | Stock (out of the box) | After all 8 batches | Difference |
 |---|---|---|---|
-| System packages (user 0) | 405 | **378** | -27 packages |
+| System packages (user 0) | 405 | **374** | -31 packages |
 | Background telemetry SDKs | 4 (MSA, Joyose, analytics, bugreport) + MiSightService | **0** | -5 telemetry services |
-| Ad surfaces | Notifications, GetApps, Settings, minus screen, app drawer search | **None** | All ad surfaces removed |
+| Ad surfaces | Notifications, GetApps, Settings, minus screen, app drawer search, Glance carousel | **None** | All ad surfaces removed |
 | Meta background tracking | 3 services running constantly | **0** | -3 tracking services |
 | Microsoft Link to Windows | 3 services running | **0** | -3 unused services |
 | Google bloat (Duo/Meet, YT Music, Wellbeing) | 3 apps (~120 MB RAM when running) | **0** | -120 MB RAM |
+| OEM / Vendor preloads | 4 (Amazon, Glance, WPS Lite, WDS Kryten) | **0** | -4 preloaded packages |
 | Xiaomi duplicate apps | 9 (browser, music, video, etc.) | **0** | -9 duplicates |
-| Free RAM (typical) | ~5.5 GB | **~5.4 GB** | Similar, but no bloat eating it |
-| Used RAM (pss) | ~5.0 GB | **~4.9 GB** | ~100-150 MB less used by bloat |
+| Free RAM (typical) | ~5.5 GB | **~7.4 GB** | Substantial RAM freed |
 | Ads in Notification shade | Yes (MSA pushes them) | **No** | Eliminated |
 | GetApps auto-installing junk | Yes (in background) | **No** | Eliminated |
 | Telemetry phoning home | Xiaomi + Meta + Microsoft | **Xiaomi core only** | Most telemetry stopped |
 
-### What was removed (27 packages across 7 batches)
+### What was removed (31 packages across 8 batches)
 
 **Batch 1 - Ad/telemetry (4):** MSA (Xiaomi Ad SDK), Joyose, analytics, bugreport
 **Batch 2 - Xiaomi duplicate apps (9):** Mi Browser, Mi Music, Mi Video, YellowPage, TouchAssistant, ThirdAppAssistant, SecurityAdd, GetApps, Discover
@@ -158,6 +158,7 @@ This section shows what the debloat actually achieved on the author's POCO F7, s
 **Batch 5 - Xiaomi app drawer + minus screen (2):** appfinder, globalminusscreen
 **Batch 6 - Google + Xiaomi extra (5):** Duo/Meet, YouTube Music, Digital Wellbeing, MiSightService, Barrage
 **Batch 7 - Chinese biometric auth (1):** Tencent SOTER
+**Batch 8 - Preloaded OEM / Vendor bloat (4):** Amazon AppManager, Wallpaper Carousel (Glance), WPS Office Lite, WDS Kryten
 
 ### What was deliberately KEPT (and why)
 
@@ -543,7 +544,7 @@ bash debloat.sh --list
 # 4. Run interactively (explains each package, prompts y/N/s per package)
 bash debloat.sh
 
-# Or run non-interactively (removes all 7 batches without prompting)
+# Or run non-interactively (removes all 8 batches without prompting)
 bash debloat.sh --yes
 
 # Or run a single batch only
@@ -683,6 +684,15 @@ bash restore.sh --batch 1
 |---|---|---|
 | `com.tencent.soter.soterserver` | Tencent SOTER biometric auth server (6 MB RAM running) | Chinese biometric authentication standard for WeChat/QQ login. Useless outside China |
 
+### Batch 8 - Preloaded OEM / Vendor bloat (4 packages)
+
+| Package | What it is | Why remove |
+|---|---|---|
+| `com.amazon.appmanager` | Amazon AppManager | Preloaded Amazon background agent. Runs background checks and telemetry |
+| `com.miui.android.fashiongallery` | Wallpaper Carousel (Glance) | Preinstalled lockscreen wallpaper carousel displaying dynamic ads, stories, and network drain |
+| `cn.wps.xiaomi.abroad.lite` | WPS Office Lite (Xiaomi) | Preinstalled third-party office document viewer with built-in ads. Replaced by Microsoft Word |
+| `com.wdstechnology.android.kryten` | WDS Kryten | Carrier diagnostic and APN provisioning background service. Not needed for normal operation |
+
 ---
 
 ## Backup & restore
@@ -709,7 +719,7 @@ bash restore.sh com.miui.msa.global
 # Restore several packages
 bash restore.sh com.miui.msa.global com.xiaomi.joyose com.miui.analytics
 
-# Restore a specific batch (1-7)
+# Restore a specific batch (1-8)
 bash restore.sh --batch 3
 
 # Preview what would be restored (dry run)
