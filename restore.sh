@@ -78,6 +78,15 @@ PKG_META=(
   "com.miui.android.fashiongallery|Wallpaper Carousel (Glance)|Preinstalled lockscreen wallpaper carousel that displays dynamic ads, sponsored stories, and feeds.|Was removed: lockscreen ads and background network drain.|Restoring re-enables Wallpaper Carousel and dynamic lockscreen stories."
   "cn.wps.xiaomi.abroad.lite|WPS Office Lite (Xiaomi)|Preinstalled third-party office document viewer with built-in ads.|Was removed: replaced by Microsoft Word/other; ad-supported bloat.|Restoring brings back WPS Office Lite."
   "com.wdstechnology.android.kryten|WDS Kryten|Carrier diagnostic and APN provisioning background service.|Was removed: unneeded carrier provisioning agent.|Restoring re-enables the WDS Kryten service."
+  "com.milink.service|Mi Link (Smart Hub)|Background service for streaming/casting to Xiaomi Smart TVs and IoT devices. Uses ~280 MB RAM.|Was removed: ~280 MB RAM background overhead; smart TV casting not used.|Restoring re-enables Xiaomi Smart Hub casting to Xiaomi TVs."
+  "com.xiaomi.payment|Xiaomi Pay (Mi Pay)|Xiaomi payment framework for Mi Wallet in China/India.|Was removed: unused payment service in Malaysia.|Restoring re-enables Xiaomi Pay backend."
+  "com.xiaomi.aiservice|Xiaomi AI Service (XiaoAI)|Xiaomi voice and AI backend. Uses ~15 MB RAM.|Was removed: unused Xiaomi AI service; ~15 MB RAM.|Restoring re-enables XiaoAI backend."
+  "com.xiaomi.aiasst.vision|XiaoAI Vision|Xiaomi screen recognition companion for XiaoAI assistant.|Was removed: unused XiaoAI companion.|Restoring re-enables XiaoAI screen vision."
+  "com.miui.virtualsim|Mi Roaming (Virtual SIM)|Xiaomi international roaming eSIM store.|Was removed: unused roaming eSIM store.|Restoring re-enables Xiaomi Mi Roaming store."
+  "com.miui.huanji|Mi Mover|Phone cloning and migration tool.|Was removed: one-time migration tool sits idle.|Restoring brings back Mi Mover app."
+  "com.google.android.marvin.talkback|Android Accessibility TalkBack|Screen reader for visually impaired users. Uses ~9-30 MB RAM.|Was removed: accessibility screen reader not used; ~9-30 MB RAM.|Restoring re-enables TalkBack accessibility screen reader."
+  "com.google.android.videos|Google TV (Play Movies)|Google TV streaming aggregator and movie rental store.|Was removed: video rental store not needed.|Restoring brings back Google TV app."
+  "com.google.android.apps.subscriptions.red|Google One system stub|System promotion stub for Google One subscriptions.|Was removed: promotional stub for cloud storage upsell.|Restoring brings back Google One subscription stub."
 )
 
 # ---------- Look up metadata for a package ----------
@@ -130,10 +139,25 @@ restore_one() {
     if adb shell pm enable --user 0 "$pkg" >/dev/null 2>&1 </dev/null; then
       echo "  ${C_GREEN}OK${C_RESET}    $pkg (was disabled, re-enabled)"
       return 0
-    else
-      echo "  ${C_RED}FAIL${C_RESET}  $pkg -> $out"
-      return 1
     fi
+
+    # Fallback to local backup APK if present in backup/apks
+    local apk_dir="${BACKUP_DIR}/apks/${pkg}"
+    local single_apk="${BACKUP_DIR}/apks/${pkg}.apk"
+    if [ -d "$apk_dir" ]; then
+      if adb install-multiple -r -d "${apk_dir}"/*.apk >/dev/null 2>&1 </dev/null; then
+        echo "  ${C_GREEN}OK${C_RESET}    $pkg (restored from backup split APKs)"
+        return 0
+      fi
+    elif [ -f "$single_apk" ]; then
+      if adb install -r -d "$single_apk" >/dev/null 2>&1 </dev/null; then
+        echo "  ${C_GREEN}OK${C_RESET}    $pkg (restored from backup APK)"
+        return 0
+      fi
+    fi
+
+    echo "  ${C_RED}FAIL${C_RESET}  $pkg -> $out"
+    return 1
   fi
 }
 

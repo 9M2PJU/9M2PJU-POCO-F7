@@ -9,7 +9,7 @@
 #   bash debloat.sh             # interactive (explains + prompts per package)
 #   bash debloat.sh --yes       # non-interactive, removes all batches
 #   bash debloat.sh --list      # only list what would be removed, do nothing
-#   bash debloat.sh --batch 2   # only run batch N (1-8)
+#   bash debloat.sh --batch 2   # only run batch N (1-10)
 #
 # Each removed package is appended to removed_packages.txt in the same
 # folder as this script. Pair with restore.sh to undo.
@@ -274,6 +274,21 @@ BATCH8=(
   "com.wdstechnology.android.kryten|WDS Kryten|Carrier diagnostic and APN provisioning background service.|Carrier provisioning agent not needed for standard cellular operation.|Safe to remove. Cellular voice, SMS, and data connectivity remain fully functional."
 )
 
+BATCH9=(
+  "com.milink.service|Mi Link (Smart Hub)|Background service for streaming/casting to Xiaomi Smart TVs and IoT devices. Runs two persistent processes consuming ~280 MB RAM.|Reclaim ~280 MB background RAM. If you do not cast to Xiaomi TVs, this service is wasted overhead.|Safe to remove. Standard Google Cast / Chromecast / DLNA still works."
+  "com.xiaomi.payment|Xiaomi Pay (Mi Pay)|Xiaomi payment framework used for Mi Wallet and transit cards in China/India. Unused in Malaysia where Google Wallet and Touch 'n Go are standard.|Removes unused payment background service and telemetry.|Safe to remove. Google Wallet, banking apps, and e-wallets unaffected."
+  "com.xiaomi.aiservice|Xiaomi AI Service (XiaoAI)|Xiaomi voice and system AI service. Phones home to Xiaomi servers for AI models. Uses ~15 MB RAM.|Stops unused Xiaomi AI telemetry and frees RAM.|Safe to remove. Google Assistant / Gemini work normally."
+  "com.xiaomi.aiasst.vision|XiaoAI Vision|Xiaomi computer vision and screen recognition companion for XiaoAI assistant.|Companion to Xiaomi AI service; unused outside China.|Safe to remove. Camera AI scene recognition and Google Lens unaffected."
+  "com.miui.virtualsim|Mi Roaming (Virtual SIM)|Xiaomi international roaming eSIM store and service.|Unused when using standard local SIM cards or standard travel eSIMs.|Safe to remove. Physical SIM slots, mobile data, and normal carrier features unaffected."
+  "com.miui.huanji|Mi Mover|Phone cloning and migration tool used only once when setting up a new phone.|Sits permanently idle in system after initial setup.|Safe to remove. No daily features affected."
+)
+
+BATCH10=(
+  "com.google.android.marvin.talkback|Android Accessibility TalkBack|Screen reader for visually impaired users. Runs persistently in background consuming ~9-30 MB RAM.|Accessibility screen reader not used. Frees ~9-30 MB RAM.|Safe to remove if you do not use TalkBack screen reading."
+  "com.google.android.videos|Google TV (Play Movies)|Google TV streaming aggregator and movie rental store.|Video rental store not needed or accessible via web/Play Store.|Safe to remove. Netflix, YouTube, VLC, and other video apps unaffected."
+  "com.google.android.apps.subscriptions.red|Google One system stub|System promotion stub for Google One cloud storage subscriptions.|Promotional stub for Google cloud storage upsell.|Safe to remove. Google Drive, Google Photos, and standard Google backups unaffected."
+)
+
 # ---------- Parse args ----------
 while [ "$#" -gt 0 ]; do
   case "$1" in
@@ -333,6 +348,8 @@ run_one 5 "Xiaomi app drawer search + minus screen" "${BATCH5[@]}"
 run_one 6 "Google + Xiaomi extra bloat"             "${BATCH6[@]}"
 run_one 7 "Chinese biometric auth (Tencent SOTER)"  "${BATCH7[@]}"
 run_one 8 "Preloaded OEM / Vendor bloat"            "${BATCH8[@]}"
+run_one 9 "Xiaomi unused ecosystem services"       "${BATCH9[@]}"
+run_one 10 "Google optional bloat"                 "${BATCH10[@]}"
 
 if [ "$LIST_ONLY" = "1" ]; then
   echo "List-only mode - nothing was changed."

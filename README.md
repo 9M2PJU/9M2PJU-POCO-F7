@@ -25,10 +25,10 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Scrip
 # Download only, don't run yet (review the scripts first)
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --no-run
 
-# Non-interactive - remove all 8 batches without prompting
+# Non-interactive - remove all 10 batches without prompting
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --yes
 
-# Run only a specific batch (1-8)
+# Run only a specific batch (1-10)
 curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --batch 1
 
 # Install to a specific directory
@@ -134,22 +134,22 @@ This section shows what the debloat actually achieved on the author's POCO F7, s
 
 ### Stock vs after debloat - the numbers
 
-| Metric | Stock (out of the box) | After all 8 batches | Difference |
+| Metric | Stock (out of the box) | After all 10 batches | Difference |
 |---|---|---|---|
-| System packages (user 0) | 405 | **374** | -31 packages |
-| Background telemetry SDKs | 4 (MSA, Joyose, analytics, bugreport) + MiSightService | **0** | -5 telemetry services |
+| System packages (user 0) | 405 | **365** | -40 packages |
+| Background telemetry SDKs | 4 (MSA, Joyose, analytics, bugreport) + MiSightService + XiaoAI | **0** | -6 telemetry services |
 | Ad surfaces | Notifications, GetApps, Settings, minus screen, app drawer search, Glance carousel | **None** | All ad surfaces removed |
 | Meta background tracking | 3 services running constantly | **0** | -3 tracking services |
 | Microsoft Link to Windows | 3 services running | **0** | -3 unused services |
-| Google bloat (Duo/Meet, YT Music, Wellbeing) | 3 apps (~120 MB RAM when running) | **0** | -120 MB RAM |
+| Google bloat (Duo/Meet, YT Music, Wellbeing, TalkBack, Google TV, One) | 6 apps (~160 MB RAM when running) | **0** | -160 MB RAM |
 | OEM / Vendor preloads | 4 (Amazon, Glance, WPS Lite, WDS Kryten) | **0** | -4 preloaded packages |
-| Xiaomi duplicate apps | 9 (browser, music, video, etc.) | **0** | -9 duplicates |
-| Free RAM (typical) | ~5.5 GB | **~7.4 GB** | Substantial RAM freed |
+| Xiaomi duplicate & unused services | 15 (browser, music, video, Mi Link, Mi Pay, XiaoAI, etc.) | **0** | -15 duplicates & services |
+| Free RAM (typical) | ~5.5 GB | **~7.3 - 7.5 GB** | ~1.8 - 2.0 GB more available RAM |
 | Ads in Notification shade | Yes (MSA pushes them) | **No** | Eliminated |
 | GetApps auto-installing junk | Yes (in background) | **No** | Eliminated |
 | Telemetry phoning home | Xiaomi + Meta + Microsoft | **Xiaomi core only** | Most telemetry stopped |
 
-### What was removed (31 packages across 8 batches)
+### What was removed (40 packages across 10 batches)
 
 **Batch 1 - Ad/telemetry (4):** MSA (Xiaomi Ad SDK), Joyose, analytics, bugreport
 **Batch 2 - Xiaomi duplicate apps (9):** Mi Browser, Mi Music, Mi Video, YellowPage, TouchAssistant, ThirdAppAssistant, SecurityAdd, GetApps, Discover
@@ -159,6 +159,8 @@ This section shows what the debloat actually achieved on the author's POCO F7, s
 **Batch 6 - Google + Xiaomi extra (5):** Duo/Meet, YouTube Music, Digital Wellbeing, MiSightService, Barrage
 **Batch 7 - Chinese biometric auth (1):** Tencent SOTER
 **Batch 8 - Preloaded OEM / Vendor bloat (4):** Amazon AppManager, Wallpaper Carousel (Glance), WPS Office Lite, WDS Kryten
+**Batch 9 - Xiaomi unused ecosystem services (6):** Mi Link, Xiaomi Pay, Xiaomi AI Service, XiaoAI Vision, Mi Roaming, Mi Mover
+**Batch 10 - Google optional bloat (3):** TalkBack, Google TV, Google One system stub
 
 ### What was deliberately KEPT (and why)
 
@@ -167,19 +169,14 @@ The author reviewed every remaining suspicious package and chose to keep these b
 | Package | Why kept |
 |---|---|
 | `com.google.android.apps.bard` (Gemini) | Used for AI assistance |
-| `com.google.android.apps.subscriptions.red` (Google One) | Active subscription |
-| `com.google.android.videos` (Google TV) | Used for movie rentals |
 | `com.google.android.apps.docs` (Docs/Drive) | Used for document viewing |
 | `com.google.android.apps.safetyhub` | Emergency alerts feature wanted |
-| `com.xiaomi.aiservice` / `aiasst.vision` / `aicr` | Xiaomi AI features (Super Wallpaper, screen recognition, voice) |
 | `com.xiaomi.mi_connect_service` (40 MB RAM) | File sharing with other Xiaomi devices |
 | `com.mi.healthglobal` (Mi Health) | Health tracking |
 | `com.miui.cleaner` (Mi Cleaner) | Storage management |
-| `com.xiaomi.payment` (Xiaomi Pay) | Payment feature kept as backup |
 | `com.xiaomi.glgm` (Game Turbo) | Performance optimization for games |
 | `com.xiaomi.hypercomm` | HyperOS cross-device features |
 | `com.xiaomi.cameramind` / `cameratools` | Camera AI scene detection + tools |
-| `com.milink.service` | Related to Mi Connect (kept) |
 | `com.miuix.editor` (Mi Video Editor) | Video editing |
 | `com.miui.extraphoto` | Photo effects/filters |
 | `com.xiaomi.mtb` / `ugd` | Unknown purpose - kept for safety |
@@ -544,7 +541,7 @@ bash debloat.sh --list
 # 4. Run interactively (explains each package, prompts y/N/s per package)
 bash debloat.sh
 
-# Or run non-interactively (removes all 8 batches without prompting)
+# Or run non-interactively (removes all 10 batches without prompting)
 bash debloat.sh --yes
 
 # Or run a single batch only
@@ -693,6 +690,25 @@ bash restore.sh --batch 1
 | `cn.wps.xiaomi.abroad.lite` | WPS Office Lite (Xiaomi) | Preinstalled third-party office document viewer with built-in ads. Replaced by Microsoft Word |
 | `com.wdstechnology.android.kryten` | WDS Kryten | Carrier diagnostic and APN provisioning background service. Not needed for normal operation |
 
+### Batch 9 - Xiaomi unused ecosystem services (6 packages)
+
+| Package | What it is | Why remove |
+|---|---|---|
+| `com.milink.service` | Mi Link (Smart Hub, ~280 MB RAM running) | Background service for casting to Xiaomi Smart TVs. Consumes ~280 MB RAM |
+| `com.xiaomi.payment` | Xiaomi Pay (Mi Pay) | Xiaomi payment framework for Mi Wallet. Unused outside China/India |
+| `com.xiaomi.aiservice` | Xiaomi AI Service (XiaoAI, ~15 MB RAM running) | Xiaomi voice/system AI service. Replaced by Google Assistant/Gemini |
+| `com.xiaomi.aiasst.vision` | XiaoAI Vision | Screen recognition companion for XiaoAI assistant |
+| `com.miui.virtualsim` | Mi Roaming (Virtual SIM) | Xiaomi roaming eSIM store. Unused with standard physical/eSIM carriers |
+| `com.miui.huanji` | Mi Mover | One-time phone migration tool. Sits idle permanently after setup |
+
+### Batch 10 - Google optional bloat (3 packages)
+
+| Package | What it is | Why remove |
+|---|---|---|
+| `com.google.android.marvin.talkback` | Android Accessibility TalkBack (~9-30 MB RAM) | Screen reader for visually impaired users. Not needed if you don't use TalkBack |
+| `com.google.android.videos` | Google TV (Play Movies) | Google TV streaming aggregator and movie rental store |
+| `com.google.android.apps.subscriptions.red` | Google One system stub | Promotional stub for Google cloud storage subscriptions |
+
 ---
 
 ## Backup & restore
@@ -719,7 +735,7 @@ bash restore.sh com.miui.msa.global
 # Restore several packages
 bash restore.sh com.miui.msa.global com.xiaomi.joyose com.miui.analytics
 
-# Restore a specific batch (1-8)
+# Restore a specific batch (1-10)
 bash restore.sh --batch 3
 
 # Preview what would be restored (dry run)

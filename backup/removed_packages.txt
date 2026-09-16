@@ -56,3 +56,16 @@ com.amazon.appmanager
 com.miui.android.fashiongallery
 cn.wps.xiaomi.abroad.lite
 com.wdstechnology.android.kryten
+
+# 2026-09-16 - Batch 9: Xiaomi unused services
+com.milink.service
+com.xiaomi.payment
+com.xiaomi.aiservice
+com.xiaomi.aiasst.vision
+com.miui.virtualsim
+com.miui.huanji
+
+# 2026-09-16 - Batch 10: Google optional bloat
+com.google.android.marvin.talkback
+com.google.android.videos
+com.google.android.apps.subscriptions.red

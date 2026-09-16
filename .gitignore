@@ -24,4 +24,7 @@ AGENTS.md
 *.log
 *.bak
 *.tmp
+*.apk
+backup/apks/
+backup/*2026-09-16*
 .env
