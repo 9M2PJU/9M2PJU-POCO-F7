@@ -100,8 +100,9 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.
     - [Fastboot error codes & troubleshooting](#fastboot-error-codes--troubleshooting)
   - [Part 6: Custom ROM & Recovery Flashing Guide](#part-6-custom-rom--recovery-flashing-guide)
     - [OrangeFox Recovery installation](#orangefox-recovery-installation)
-    - [ZKOS EU / Xiaomi.eu ROM flashing](#zkos-eu--xiaomieu-rom-flashing)
-    - [Sakata KernelSU installation](#sakata-kernelsu-installation)
+    - [ZKOS Custom ROM flavors (Global vs Xiaomi.eu/China)](#zkos-custom-rom-flavors-global-vs-xiaomieuchina)
+    - [Flashing ZKOS Global or EU ROM](#flashing-zkos-global-or-eu-rom)
+    - [Sakata KernelSU & Play Integrity setup](#sakata-kernelsu--play-integrity-setup)
 - [Troubleshooting & FAQ](#troubleshooting--faq)
 - [License & Disclaimer](#license--disclaimer)
 - [Sponsor](#sponsor)
@@ -750,7 +751,7 @@ Comprehensive error code documentation is maintained in `MiUnlockTool/miunlock-c
 
 ## Part 6: Custom ROM & Recovery Flashing Guide
 
-Once the bootloader is unlocked, you can install custom recoveries and ROMs.
+Once the bootloader is unlocked, you can install custom recoveries and optimized ROMs like **ZKOS (ProjectZK)**.
 
 ### OrangeFox Recovery installation
 
@@ -767,35 +768,69 @@ fastboot reboot recovery
 
 ---
 
-### ZKOS EU / Xiaomi.eu ROM flashing
+### ZKOS Custom ROM flavors (Global vs Xiaomi.eu/China)
 
-ZKOS EU (`ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU`) provides an optimized, debloated, China-base HyperOS experience with full Google Play Services and European localization.
+ProjectZK offers two distinct builds for POCO F7 (`onyx`). Both include custom thermal profiles (Battery, Balanced, Performance, Extreme), refresh rate unlockers, pre-debloated frameworks, and native call recording:
+
+| Feature / Factor | `ZKOS WOLMIXM` (Global Base) | `ZKOS WOLCNXM_EU` (xiaomi.eu Base) |
+|---|---|---|
+| **Base Firmware** | Official Global HyperOS (`OS3.0.303.0.WOLMIXM`) | China HyperOS via xiaomi.eu (`OS3.0.305.0.WOLCNXM`) |
+| **Banking & Play Integrity** | **Rock Solid.** Native Global device fingerprint. Minimal risk of sudden banking lockouts. | **Requires Maintenance.** Relies on xiaomi.eu spoofing; requires updating fix modules when Google bans fingerprints. |
+| **Modem & Carrier (Maxis / SEA)** | **100% Native Global Modem.** Best VoLTE, VoWiFi, and 5G carrier aggregation for Malaysian / international telcos. | China base modem; works fine, but may occasionally require manual VoWiFi/carrier provisioning tweaks. |
+| **Android Auto** | **Native & Flawless.** Full Google framework integration out of the box. | Can suffer connection drops or permission quirks on wireless head units. |
+| **Push Notifications** | Standard FCM push handling. Reliable background sync for messaging apps. | Aggressive Chinese power management; requires setting messaging apps to "No restrictions". |
+| **UI & Visual Eye Candy** | Clean, standard Global UI with ZK enhancements. | **Richer.** Latest China animations, Super Widgets, and lockscreen depth effects. |
+| **Recommendation** | **Recommended for daily drivers & banking users.** | Recommended for enthusiasts seeking bleeding-edge CN UI features. |
+
+---
+
+### Flashing ZKOS Global or EU ROM
+
+#### Option A: Fastboot Installation (First Install - Wipes Data)
 
 ```bash
-# Option A: Fastboot installation (First install - wipes data)
+# For Global Base (Recommended):
+unzip ZKOS_ONYX_OS3.0.303.0.WOLMIXM_MI260810.zip -d zkos_rom
+cd zkos_rom
+./linux_fastboot_first_install_with_data_format.sh    # On Windows: ./windows_fastboot_first_install_with_data_format.sh
+
+# For EU / China Base:
 unzip ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU260914.zip -d zkos_rom
 cd zkos_rom
-./windows_fastboot_first_install_with_data_format.sh   # On Linux: ./linux_fastboot_first_install_with_data_format.sh
+./linux_fastboot_first_install_with_data_format.sh    # On Windows: ./windows_fastboot_first_install_with_data_format.sh
+```
 
-# Option B: Recovery installation (via OrangeFox)
-# In OrangeFox: Wipe -> Format Data -> Type 'yes'
-# Advanced -> ADB Sideload
-adb sideload ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU260914.zip
+#### Option B: Recovery Installation (via OrangeFox)
+
+```bash
+# 1. In OrangeFox: Go to Wipe -> Format Data -> Type 'yes'
+# 2. Go to Advanced -> ADB Sideload
+# 3. From computer, run:
+adb sideload ZKOS_ONYX_OS3.0.303.0.WOLMIXM_MI260810.zip
+# 4. Reboot system
 ```
 
 ---
 
-### Sakata KernelSU installation
+### Sakata KernelSU & Play Integrity setup
 
-For systemless root access with 100% Play Integrity and banking app compatibility:
+For systemless root access with 100% Play Integrity and banking app compatibility on unlocked bootloaders:
 
-1. Download `Sakata-CLO-onyx-v2.1-KSU.zip`.
-2. Boot into OrangeFox Recovery.
-3. Flash the kernel ZIP:
-   ```bash
-   adb sideload Sakata-CLO-onyx-v2.1-KSU.zip
-   ```
-4. Reboot to system and install the KernelSU manager APK.
+1. **Flash Custom Kernel:**
+   * Download `Sakata-CLO-onyx-v2.1-KSU.zip`.
+   * Boot into OrangeFox Recovery and flash the kernel ZIP:
+     ```bash
+     adb sideload Sakata-CLO-onyx-v2.1-KSU.zip
+     ```
+2. **Install Root Manager:**
+   * Reboot to system and install the **KernelSU** manager app.
+3. **Configure Banking & Root Hiding:**
+   * Install **Zygisk Next** and **Shamiko** modules in KernelSU.
+   * Install **PlayIntegrityFix (PIF)** or **TrickyStore** to pass `MEETS_DEVICE_INTEGRITY`.
+   * Add all banking apps (Maybank MAE, Touch 'n Go eWallet, ShopeePay, CIMB, JPJ) to the DenyList/exclusion list.
+4. **Re-Apply System Tuning:**
+   * Run `bash debloat.sh --yes` to remove any remaining system telemetry.
+   * Run `bash optimize.sh` to re-apply 0.5x animation scales, 90Hz refresh rate, and network optimizations.
 
 ---
 
