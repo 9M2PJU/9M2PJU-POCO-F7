@@ -1,24 +1,30 @@
-# 9M2PJU - POCO F7 Toolkit & Debloat Guide
+# 9M2PJU - POCO F7 Toolkit & Power-User Guide
 
-A comprehensive, safe, and modular power-user toolkit for the **POCO F7 (codename `onyx` / `onyx_global`)** running HyperOS 2 / Android 16.
+A modular, structured toolkit for the **POCO F7 (codename `onyx` / `onyx_global`)** running HyperOS 2 / Android 16.
 
 > Maintained by [9M2PJU](https://github.com/9M2PJU) - Tested on POCO F7 (`25053PC47G`, ROM `OS3.0.302.0.WOLMIXM` / `OS3.0.303.0.WOLMIXM`, HyperOS V816, Android 16)
 
 ---
 
-## Overview
+## 🧭 Which Guide Do You Need? (Choose Your Path)
 
-This repository provides an end-to-end management toolkit for the POCO F7:
-1. **Safe No-Root Debloat Engine (`debloat.sh` & `restore.sh`)** - Remove 40 preloaded ad, telemetry, and junk packages in 10 safe batches with interactive decision cards and zero risk of bricking.
-2. **System Health & Performance Optimizer (`optimize.sh`)** - Automated UFS 4.1 storage TRIM, AOT bytecode compilation, 90Hz refresh rate tuning, audio DSP wakeup suppression, and background memory restrictions.
-3. **Comprehensive Device Backup & 1-Click Restore** - Complete non-destructive backup suite capturing all 135+ user APKs (base + split packages), full internal storage, contacts (VCF), SMS conversations, call logs, Termux environment, and system settings.
-4. **HyperOS Bootloader Unlock Quota Sniper (`sc_avoid_quota/`)** - Multi-session automated token sniper with millisecond precision timeshift for securing daily midnight UTC+8 Xiaomi unlock quotas.
-5. **Native Linux Fastboot Bootloader Unlock (`MiUnlockTool`)** - Complete Linux-native CLI tool (`miunlock`) to authenticate with Xiaomi servers, sign device tokens cryptographically, and unlock bootloader partitions without Windows.
-6. **Custom ROM & Recovery Reference** - Detailed flashing guides for OrangeFox Recovery, ZKOS HyperOS EU, and Sakata KernelSU.
+To prevent confusion and accidental data loss, this toolkit is strictly divided into **two independent tiers**:
+
+| Guide Tier | Primary Goal | Bootloader State | Data Wipe? | Root Required? | Banking & GPay | Target Audience |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **🟢 TIER 1: Stock Optimization** | Remove Ads, Debloat & Boost Speed | **Locked (Stock)** | ❌ **Zero Data Loss** | ❌ No | ✅ 100% Intact | **100% of Users** |
+| **🔴 TIER 2: Unlock & Custom ROMs** | Flash Custom ROMs, Recovery & Root | **Unlocked** | ⚠️ **Wipes All Data** | ⚠️ Yes | ⚠️ Needs Fixes | **Advanced Modders** |
 
 ---
 
-## Quick start - One-liner debloat
+## 🟢 TIER 1: Safe Stock OS Optimization (No Root, Zero Data Loss)
+> **Recommended for everyday users.** Does NOT modify system partitions, does NOT wipe photos or app data, does NOT void warranty, and leaves Google Pay / Banking apps fully working.
+
+1. **Safe No-Root Debloat Engine (`debloat.sh` & `restore.sh`)** — Remove 40 preloaded ad, telemetry, and junk packages in 10 safe batches with interactive decision cards and zero risk of bricking.
+2. **System Health & Performance Optimizer (`optimize.sh`)** — Automated UFS 4.1 storage TRIM, AOT bytecode compilation, 90Hz refresh rate tuning, audio DSP wakeup suppression, and background memory restrictions.
+3. **Comprehensive Device Backup & 1-Click Restore** — Complete non-destructive backup suite capturing user APKs, internal storage, contacts (VCF), SMS conversations, call logs, Termux environment, and system settings.
+
+### ⚡ Quick Start — One-Liner Safe Debloat
 
 Connect your POCO F7 via USB with USB debugging enabled, then run:
 
@@ -28,7 +34,7 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.
 
 This downloads `debloat.sh` and `restore.sh` into the current working directory and launches `debloat.sh` in interactive mode (prompts with full package info before each item).
 
-### One-liner variants
+#### One-Liner Variants
 
 ```bash
 # Preview only - display what would be removed, change nothing
@@ -49,47 +55,53 @@ curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.
 
 ---
 
+## 🔴 TIER 2: Advanced Bootloader Unlock & Custom ROMs (Destructive)
+> ⚠️ **CAUTION**: Unlocking the bootloader forces a **mandatory factory reset (erases all data)** and modifies cryptographic partition signatures.
+> **If you only want to remove ads and speed up your stock phone, DO NOT PROCEED HERE — USE TIER 1 ABOVE.**
+
+4. **HyperOS Bootloader Unlock Quota Sniper (`sc_avoid_quota/`)** — Multi-session automated token sniper with millisecond precision timeshift for securing daily midnight UTC+8 Xiaomi unlock quotas.
+5. **Native Linux Fastboot Bootloader Unlock (`MiUnlockTool`)** — Complete Linux-native CLI tool (`miunlock`) to authenticate with Xiaomi servers, sign device tokens cryptographically, and unlock bootloader partitions without Windows.
+6. **Custom ROM & Recovery Reference** — Detailed flashing guides for OrangeFox Recovery, ZKOS HyperOS EU, and Sakata KernelSU.
+
+---
+
 ## Table of contents
 
-- [Overview](#overview)
-- [Quick start - One-liner debloat](#quick-start---one-liner-debloat)
+- [🧭 Which Guide Do You Need? (Path Selection)](#-which-guide-do-you-need-choose-your-path)
 - [Device specifications & test baseline](#device-specifications--test-baseline)
 - [Repository structure](#repository-structure)
 - [Requirements & setup](#requirements--setup)
-  - [Step 1: Install ADB and Fastboot](#step-1-install-adb-and-fastboot)
-  - [Step 2: Enable Developer Options on HyperOS](#step-2-enable-developer-options-on-hyperos)
-  - [Step 3: Enable USB Debugging](#step-3-enable-usb-debugging)
-  - [Step 4: Authorize computer connection](#step-4-authorize-computer-connection)
-  - [Step 5: Verify device state](#step-5-verify-device-state)
-- [Part 1: Safe No-Root Debloat Engine](#part-1-safe-no-root-debloat-engine)
-  - [How it works (the package manager science)](#how-it-works-the-package-manager-science)
-  - [Interactive decision interface](#interactive-decision-interface)
-  - [Batch breakdown (40 packages across 10 batches)](#batch-breakdown-40-packages-across-10-batches)
-  - [Packages deliberately kept (and why)](#packages-deliberately-kept-and-why)
-  - [Restoring removed packages](#restoring-removed-packages)
-  - [Measured performance and RAM gains](#measured-performance-and-ram-gains)
-- [Part 2: Performance Optimizer (`optimize.sh`)](#part-2-performance-optimizer-optimizesh)
-  - [Automated optimization suite](#automated-optimization-suite)
-  - [Detailed manual tuning reference](#detailed-manual-tuning-reference)
-- [Part 3: Complete Device Backup & 1-Click Restore](#part-3-complete-device-backup--1-click-restore)
-  - [Backup components & directory structure](#backup-components--directory-structure)
-  - [Running the full backup suite](#running-the-full-backup-suite)
-  - [1-Click full device restoration](#1-click-full-device-restoration)
-- [Part 4: HyperOS Bootloader Unlock Quota Sniper](#part-4-hyperos-bootloader-unlock-quota-sniper)
-  - [Understanding the Xiaomi daily quota mechanism](#understanding-the-xiaomi-daily-quota-mechanism)
-  - [Extracting authentication tokens](#extracting-authentication-tokens)
-  - [Configuring multi-session tokens and timeshift offsets](#configuring-multi-session-tokens-and-timeshift-offsets)
-  - [Running the parallel multi-instance sniper](#running-the-parallel-multi-instance-sniper)
-  - [Binding account in HyperOS settings](#binding-account-in-hyperos-settings)
-- [Part 5: Native Linux Fastboot Unlock (`MiUnlockTool`)](#part-5-native-linux-fastboot-unlock-miunlocktool)
-  - [Tool architecture and installation](#tool-architecture-and-installation)
-  - [Fastboot unlock workflow](#fastboot-unlock-workflow)
-  - [Understanding the 72-hour / 168-hour security timer](#understanding-the-72-hour--168-hour-security-timer)
-  - [Fastboot error codes & troubleshooting](#fastboot-error-codes--troubleshooting)
-- [Part 6: Custom ROM & Recovery Flashing Guide](#part-6-custom-rom--recovery-flashing-guide)
-  - [OrangeFox Recovery installation](#orangefox-recovery-installation)
-  - [ZKOS EU / Xiaomi.eu ROM flashing](#zkos-eu--xiaomieu-rom-flashing)
-  - [Sakata KernelSU installation](#sakata-kernelsu-installation)
+- **🟢 TIER 1: Safe Stock OS Optimization (No Root, Zero Data Loss)**
+  - [Part 1: Safe No-Root Debloat Engine](#part-1-safe-no-root-debloat-engine)
+    - [How it works (the package manager science)](#how-it-works-the-package-manager-science)
+    - [Interactive decision interface](#interactive-decision-interface)
+    - [Batch breakdown (40 packages across 10 batches)](#batch-breakdown-40-packages-across-10-batches)
+    - [Packages deliberately kept (and why)](#packages-deliberately-kept-and-why)
+    - [Restoring removed packages](#restoring-removed-packages)
+    - [Measured performance and RAM gains](#measured-performance-and-ram-gains)
+  - [Part 2: Performance Optimizer (`optimize.sh`)](#part-2-performance-optimizer-optimizesh)
+    - [Automated optimization suite](#automated-optimization-suite)
+    - [Detailed manual tuning reference](#detailed-manual-tuning-reference)
+  - [Part 3: Complete Device Backup & 1-Click Restore](#part-3-complete-device-backup--1-click-restore)
+    - [Backup components & directory structure](#backup-components--directory-structure)
+    - [Running the full backup suite](#running-the-full-backup-suite)
+    - [1-Click full device restoration](#1-click-full-device-restoration)
+- **🔴 TIER 2: Advanced Bootloader Unlock & Custom ROMs (Destructive — Wipes Data)**
+  - [Part 4: HyperOS Bootloader Unlock Quota Sniper](#part-4-hyperos-bootloader-unlock-quota-sniper)
+    - [Understanding the Xiaomi daily quota mechanism](#understanding-the-xiaomi-daily-quota-mechanism)
+    - [Extracting authentication tokens](#extracting-authentication-tokens)
+    - [Configuring multi-session tokens and timeshift offsets](#configuring-multi-session-tokens-and-timeshift-offsets)
+    - [Running the parallel multi-instance sniper](#running-the-parallel-multi-instance-sniper)
+    - [Binding account in HyperOS settings](#binding-account-in-hyperos-settings)
+  - [Part 5: Native Linux Fastboot Unlock (`MiUnlockTool`)](#part-5-native-linux-fastboot-unlock-miunlocktool)
+    - [Tool architecture and installation](#tool-architecture-and-installation)
+    - [Fastboot unlock workflow](#fastboot-unlock-workflow)
+    - [Understanding the 72-hour / 168-hour security timer](#understanding-the-72-hour--168-hour-security-timer)
+    - [Fastboot error codes & troubleshooting](#fastboot-error-codes--troubleshooting)
+  - [Part 6: Custom ROM & Recovery Flashing Guide](#part-6-custom-rom--recovery-flashing-guide)
+    - [OrangeFox Recovery installation](#orangefox-recovery-installation)
+    - [ZKOS EU / Xiaomi.eu ROM flashing](#zkos-eu--xiaomieu-rom-flashing)
+    - [Sakata KernelSU installation](#sakata-kernelsu-installation)
 - [Troubleshooting & FAQ](#troubleshooting--faq)
 - [License & Disclaimer](#license--disclaimer)
 - [Sponsor](#sponsor)
@@ -568,6 +580,18 @@ The restoration script automatically:
 2. Restores `/sdcard` directory trees (Photos, WhatsApp media, OsmAnd maps, Documents).
 3. Restores contacts from `contacts_backup.vcf` into the Android contacts provider.
 4. Restores system preferences, animation scales, and private DNS settings.
+
+---
+
+# 🔴 TIER 2: ADVANCED BOOTLOADER UNLOCK & CUSTOM ROMS
+
+> [!WARNING]
+> ### ⚠️ DESTRUCTIVE OPERATION — FULL DATA WIPE WARNING
+> The following sections (**Parts 4, 5, and 6**) are intended **ONLY** for power users who want to unlock their device's bootloader, install custom recoveries, and flash custom firmware.
+>
+> - ⚠️ **Unlocking the bootloader will force a FULL FACTORY RESET (erasing all internal storage, photos, chats, and apps).**
+> - ⚠️ **If you only want to remove bloatware/ads and optimize system performance, DO NOT PROCEED HERE. Stay on [Tier 1](#-tier-1-safe-stock-os-optimization-no-root-zero-data-loss) above.**
+> - ⚠️ **Tier 1 (Safe Debloat Engine) does NOT require an unlocked bootloader and causes ZERO data loss.**
 
 ---
 
