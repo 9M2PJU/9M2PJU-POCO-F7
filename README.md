@@ -689,15 +689,24 @@ miunlock --version
 
 ### Understanding the 72-hour / 168-hour security timer
 
-When attempting to unlock a newly bound device, Xiaomi enforces a mandatory countdown:
+When attempting to unlock a newly bound device, Xiaomi enforces a mandatory security countdown (typically 72 hours for established accounts, or 168 hours for newer accounts):
 
 ```
 Error 20036: Please unlock after 72 hours
 ```
 
-- **Do NOT re-bind or log out of your Xiaomi account on the phone** (doing so resets the timer back to 72/168 hours).
-- Keep using the phone normally with your SIM card inserted until the countdown completes.
-- Once the hours elapse, reconnect in Fastboot mode and run `miunlock` again to complete the unlock.
+#### Rules during the security countdown:
+- **Do NOT log out of your Xiaomi account on the phone** (doing so resets the timer back to 72 or 168 hours).
+- **Do NOT remove or swap the SIM card**.
+- **Do NOT tap "Add account and device" again in Developer Options**.
+- Keep using the phone normally with mobile data and SIM active until the timer elapses.
+- Once the countdown finishes, reconnect in Fastboot mode and run `miunlock` to complete the unlock.
+
+| Milestone | Timeline Offset | Action |
+|---|---|---|
+| Account Bound (Start) | T+0 Hours | Initial `miunlock` query triggers countdown |
+| Waiting Period | T+0 to T+72 Hours | Device used normally with SIM inserted |
+| Countdown Complete | T+72 Hours | Reconnect in Fastboot mode and run `miunlock` |
 
 ---
 
