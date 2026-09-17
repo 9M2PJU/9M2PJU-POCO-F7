@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Restore all packages removed by the debloat process.
 # Reads removed_packages.txt (one package per line, "package:com.foo.bar" or "com.foo.bar")
-# and runs `pm install-existing` for each — no internet needed, APKs come from /system.
+# and runs `pm install-existing` for each - no internet needed, APKs come from /system.
 #
 # Usage:
 #   bash /home/x/pocof7/backup/restore_all.sh            # restore everything
@@ -44,7 +44,7 @@ if [ "$#" -gt 0 ]; then
   for p in "$@"; do restore_one "$p"; done
 else
   if [ ! -f "$PKG_FILE" ]; then
-    echo "ERROR: $PKG_FILE not found — nothing to restore." >&2
+    echo "ERROR: $PKG_FILE not found - nothing to restore." >&2
     exit 1
   fi
   total=$(grep -c . "$PKG_FILE" 2>/dev/null || echo 0)

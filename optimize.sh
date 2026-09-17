@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # POCO F7 Performance & Health Optimizer
-# Repo: https://github.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script
+# Repo: https://github.com/9M2PJU/9M2PJU-POCO-F7
 # License: GPL-3.0
 # Author: 9M2PJU (9m2pju@gmail.com)
 #

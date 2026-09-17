@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 # ============================================================
-# POCO F7 Debloat — One-liner installer
+# POCO F7 Debloat - One-liner installer
 # ============================================================
 # Downloads debloat.sh and restore.sh from the GitHub repo and
 # runs debloat.sh interactively. Safe to re-run; existing files
 # are overwritten with the latest version.
 #
 # One-liner usage:
-#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash
 #
 # Or, to just download without running:
-#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --no-run
+#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --no-run
 #
 # Or, to download to a specific directory:
-#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --dir ~/poco-f7
+#   curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --dir ~/poco-f7
 # ============================================================
 
 set -u
 
-REPO_RAW="https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main"
+REPO_RAW="https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main"
 TARGET_DIR="$(pwd)"
 RUN_AFTER=1
 LIST_ONLY=0
@@ -67,7 +67,7 @@ mkdir -p "$TARGET_DIR"
 cd "$TARGET_DIR" || { echo "${C_RED}ERROR: cannot cd to $TARGET_DIR${C_RESET}" >&2; exit 1; }
 
 # ---------- Download ----------
-echo "${C_CYAN}POCO F7 Debloat — installer${C_RESET}"
+echo "${C_CYAN}POCO F7 Debloat - installer${C_RESET}"
 echo "Target dir: $(pwd)"
 echo ""
 

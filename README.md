@@ -1,574 +1,256 @@
-# 9M2PJU - POCO F7 Debloat Script
+# 9M2PJU - POCO F7 Toolkit & Debloat Guide
 
-A safe, reversible, no-root debloat toolkit for the **POCO F7 (codename `onyx_global`)** running HyperOS 2 / Android 16.
+A comprehensive, safe, and modular power-user toolkit for the **POCO F7 (codename `onyx` / `onyx_global`)** running HyperOS 2 / Android 16.
 
-> Maintained by [9M2PJU](https://github.com/9M2PJU) · Tested on ROM `OS3.0.303.0.WOLMIXM` (HyperOS V816, Android 16, security patch 2026-07-01)
+> Maintained by [9M2PJU](https://github.com/9M2PJU) - Tested on POCO F7 (`25053PC47G`, ROM `OS3.0.302.0.WOLMIXM` / `OS3.0.303.0.WOLMIXM`, HyperOS V816, Android 16)
 
 ---
 
-## One-liner (the fast way)
+## Overview
+
+This repository provides an end-to-end management toolkit for the POCO F7:
+1. **Safe No-Root Debloat Engine (`debloat.sh` & `restore.sh`)** - Remove 40 preloaded ad, telemetry, and junk packages in 10 safe batches with interactive decision cards and zero risk of bricking.
+2. **System Health & Performance Optimizer (`optimize.sh`)** - Automated UFS 4.1 storage TRIM, AOT bytecode compilation, 90Hz refresh rate tuning, audio DSP wakeup suppression, and background memory restrictions.
+3. **Comprehensive Device Backup & 1-Click Restore** - Complete non-destructive backup suite capturing all 135+ user APKs (base + split packages), full internal storage, contacts (VCF), SMS conversations, call logs, Termux environment, and system settings.
+4. **HyperOS Bootloader Unlock Quota Sniper (`sc_avoid_quota/`)** - Multi-session automated token sniper with millisecond precision timeshift for securing daily midnight UTC+8 Xiaomi unlock quotas.
+5. **Native Linux Fastboot Bootloader Unlock (`MiUnlockTool`)** - Complete Linux-native CLI tool (`miunlock`) to authenticate with Xiaomi servers, sign device tokens cryptographically, and unlock bootloader partitions without Windows.
+6. **Custom ROM & Recovery Reference** - Detailed flashing guides for OrangeFox Recovery, ZKOS HyperOS EU, and Sakata KernelSU.
+
+---
+
+## Quick start - One-liner debloat
 
 Connect your POCO F7 via USB with USB debugging enabled, then run:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash
 ```
 
-This downloads `debloat.sh` + `restore.sh` into the current directory and runs `debloat.sh` interactively (prompts y/N before each batch).
+This downloads `debloat.sh` and `restore.sh` into the current working directory and launches `debloat.sh` in interactive mode (prompts with full package info before each item).
 
 ### One-liner variants
 
 ```bash
-# Preview only - show what would be removed, change nothing
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --list
+# Preview only - display what would be removed, change nothing
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --list
 
-# Download only, don't run yet (review the scripts first)
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --no-run
+# Download only - do not execute yet (review scripts first)
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --no-run
 
-# Non-interactive - remove all 10 batches without prompting
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --yes
+# Non-interactive - remove all 10 batches automatically
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --yes
 
 # Run only a specific batch (1-10)
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --batch 1
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --batch 1
 
-# Install to a specific directory
-curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7-Debloat-Script/main/install.sh | bash -s -- --dir ~/poco-f7
+# Install to a custom directory
+curl -fsSL https://raw.githubusercontent.com/9M2PJU/9M2PJU-POCO-F7/main/install.sh | bash -s -- --dir ~/poco-f7
 ```
-
-> **Security note:** `curl | bash` runs code from the internet. If you'd rather review first, use `--no-run` or clone the repo (see [Quick start](#quick-start)) and inspect the scripts before executing.
 
 ---
 
 ## Table of contents
 
-- [One-liner (the fast way)](#one-liner-the-fast-way)
-- [What this project does](#what-this-project-does)
-- [Why debloat?](#why-debloat)
-- [Author's device - real-world results](#authors-device---real-world-results)
-  - [Visualized results](#visualized-results)
-- [How it works (the science)](#how-it-works-the-science)
+- [Overview](#overview)
+- [Quick start - One-liner debloat](#quick-start---one-liner-debloat)
+- [Device specifications & test baseline](#device-specifications--test-baseline)
 - [Repository structure](#repository-structure)
-- [Requirements](#requirements)
-  - [Step 1: Install `adb` on your computer](#step-1-install-adb-on-your-computer)
-  - [Step 2: Enable Developer Options on the phone](#step-2-enable-developer-options-on-the-phone)
-  - [Step 3: Enable USB debugging](#step-3-enable-usb-debugging)
-  - [Step 4: Connect the phone and authorize the computer](#step-4-connect-the-phone-and-authorize-the-computer)
-  - [Step 5: Verify the connection](#step-5-verify-the-connection)
-  - [Troubleshooting the ADB connection](#troubleshooting-the-adb-connection)
-- [Quick start](#quick-start)
-- [The debloat batches explained](#the-debloat-batches-explained)
-- [Backup & restore](#backup--restore)
-- [Safety guarantees](#safety-guarantees)
-- [What is NOT removed (and why)](#what-is-not-removed-and-why)
-- [HyperOS-specific notes](#hyperos-specific-notes)
-- [Performance optimizations applied](#performance-optimizations-applied)
-  - [1. UI Animation speed-up (0.5x)](#1-ui-animation-speed-up-05x)
-  - [2. Display refresh rate (90 Hz sweet spot)](#2-display-refresh-rate-90-hz-sweet-spot)
-  - [3. Screen off timeout (30 seconds)](#3-screen-off-timeout-30-seconds)
-  - [4. Hardware tethering acceleration](#4-hardware-tethering-acceleration)
-  - [5. Wi-Fi scan throttling & idle radio power saving](#5-wi-fi-scan-throttling--idle-radio-power-saving)
-  - [6. Ahead-of-Time (AOT) ART bytecode compilation](#6-ahead-of-time-aot-art-bytecode-compilation)
-  - [7. Restrict background execution on heavy apps](#7-restrict-background-execution-on-heavy-apps)
-  - [8. Storage TRIM (Garbage Collection)](#8-storage-trim-garbage-collection)
-  - [9. Bluetooth HD audio codecs](#9-bluetooth-hd-audio-codecs)
-  - [10. Logcat ring buffer reduction](#10-logcat-ring-buffer-reduction)
-  - [11. Encrypted private DNS (Cloudflare / NextDNS)](#11-encrypted-private-dns-cloudflare--nextdns)
-  - [12. Memory Extension - disable it (12 GB RAM variant)](#12-memory-extension---disable-it-12-gb-ram-variant)
-- [Battery health notes](#battery-health-notes)
-- [Troubleshooting](#troubleshooting)
-- [FAQ](#faq)
-- [Disclaimer](#disclaimer)
+- [Requirements & setup](#requirements--setup)
+  - [Step 1: Install ADB and Fastboot](#step-1-install-adb-and-fastboot)
+  - [Step 2: Enable Developer Options on HyperOS](#step-2-enable-developer-options-on-hyperos)
+  - [Step 3: Enable USB Debugging](#step-3-enable-usb-debugging)
+  - [Step 4: Authorize computer connection](#step-4-authorize-computer-connection)
+  - [Step 5: Verify device state](#step-5-verify-device-state)
+- [Part 1: Safe No-Root Debloat Engine](#part-1-safe-no-root-debloat-engine)
+  - [How it works (the package manager science)](#how-it-works-the-package-manager-science)
+  - [Interactive decision interface](#interactive-decision-interface)
+  - [Batch breakdown (40 packages across 10 batches)](#batch-breakdown-40-packages-across-10-batches)
+  - [Packages deliberately kept (and why)](#packages-deliberately-kept-and-why)
+  - [Restoring removed packages](#restoring-removed-packages)
+  - [Measured performance and RAM gains](#measured-performance-and-ram-gains)
+- [Part 2: Performance Optimizer (`optimize.sh`)](#part-2-performance-optimizer-optimizesh)
+  - [Automated optimization suite](#automated-optimization-suite)
+  - [Detailed manual tuning reference](#detailed-manual-tuning-reference)
+- [Part 3: Complete Device Backup & 1-Click Restore](#part-3-complete-device-backup--1-click-restore)
+  - [Backup components & directory structure](#backup-components--directory-structure)
+  - [Running the full backup suite](#running-the-full-backup-suite)
+  - [1-Click full device restoration](#1-click-full-device-restoration)
+- [Part 4: HyperOS Bootloader Unlock Quota Sniper](#part-4-hyperos-bootloader-unlock-quota-sniper)
+  - [Understanding the Xiaomi daily quota mechanism](#understanding-the-xiaomi-daily-quota-mechanism)
+  - [Extracting authentication tokens](#extracting-authentication-tokens)
+  - [Configuring multi-session tokens and timeshift offsets](#configuring-multi-session-tokens-and-timeshift-offsets)
+  - [Running the parallel multi-instance sniper](#running-the-parallel-multi-instance-sniper)
+  - [Binding account in HyperOS settings](#binding-account-in-hyperos-settings)
+- [Part 5: Native Linux Fastboot Unlock (`MiUnlockTool`)](#part-5-native-linux-fastboot-unlock-miunlocktool)
+  - [Tool architecture and installation](#tool-architecture-and-installation)
+  - [Fastboot unlock workflow](#fastboot-unlock-workflow)
+  - [Understanding the 72-hour / 168-hour security timer](#understanding-the-72-hour--168-hour-security-timer)
+  - [Fastboot error codes & troubleshooting](#fastboot-error-codes--troubleshooting)
+- [Part 6: Custom ROM & Recovery Flashing Guide](#part-6-custom-rom--recovery-flashing-guide)
+  - [OrangeFox Recovery installation](#orangefox-recovery-installation)
+  - [ZKOS EU / Xiaomi.eu ROM flashing](#zkos-eu--xiaomieu-rom-flashing)
+  - [Sakata KernelSU installation](#sakata-kernelsu-installation)
+- [Troubleshooting & FAQ](#troubleshooting--faq)
+- [License & Disclaimer](#license--disclaimer)
+- [Sponsor](#sponsor)
 
 ---
 
-## What this project does
+## Device specifications & test baseline
 
-Three bash scripts that talk to your POCO F7 over `adb`:
+All scripts, optimizations, backups, and unlock procedures in this repository were verified directly on the author's primary POCO F7 device:
 
-| Script | Purpose |
+| Spec | Hardware / Software Detail |
 |---|---|
-| `install.sh` | One-liner installer - downloads `debloat.sh` + `restore.sh` from GitHub and runs debloat interactively |
-| `debloat.sh` | Removes 40 known-safe bloat packages in 10 small batches. Interactive mode explains each package and prompts y/N/s per package. Also supports `--yes` (non-interactive) and `--list` (dry-run) |
-| `restore.sh` | Restores removed packages from the untouched `/system` partition (no internet needed). Interactive mode explains each package and prompts y/N/s per package. Also supports `--yes`, `--list`, `--batch N`, and explicit package names |
-
-Everything is **reversible**, **no root**, **no bootloader unlock**, **no warranty impact**, **no banking/Play Integrity breakage**.
-
-The repository also ships with the actual backup snapshot from the author's device under `backup/`, so you can see exactly what was removed and when.
-
----
-
-## Why debloat?
-
-A stock POCO F7 ships with ~405 system packages. Many are useful, but a meaningful subset is:
-
-1. **Ad/telemetry SDKs** that run constantly in the background and phone home (Xiaomi MSA, Joyose, analytics, bugreport, MiSightService)
-2. **Duplicate Xiaomi apps** you've already replaced with better alternatives (Mi Browser, Mi Music, Mi Video, YellowPage, TouchAssistant, etc.)
-3. **Meta background services** that track you even when you're not using Facebook (`com.facebook.system`, `services`, `appmanager`)
-4. **Microsoft Link to Windows** services that run whether or not you use Phone Link on a PC
-5. **Xiaomi's app recommendation engine** (GetApps / `mipicks` / `discover`) which pushes junk app installs in the background
-6. **Google + Xiaomi extra bloat** (Google Duo/Meet, YouTube Music system app, Digital Wellbeing, Xiaomi barrage) that waste RAM or have better replacements
-7. **Chinese-market services** (Tencent SOTER biometric auth) that are useless outside China and waste RAM
-8. **Preloaded OEM bloat** (Amazon AppManager, Glance lockscreen wallpaper ads, WPS Office Lite)
-9. **Unused Xiaomi ecosystem background services** (Mi Link Smart Hub, Xiaomi Pay, XiaoAI Services)
-10. **Google optional bloat** (TalkBack screen reader, Google TV, Google One stub)
-
-Removing these:
-- Cuts background CPU/RAM usage (~1.8 - 2.0 GB RAM headroom gained)
-- Stops all Xiaomi + Meta + OEM telemetry
-- Prevents GetApps and Glance from auto-installing junk or pushing lockscreen ads
-- Frees storage and maximizes available memory
-- Improves battery life and idle sleep
-- Reduces ad surface area in Notification shade, Settings, lockscreen, and launcher
-
----
-
-## Author's device - real-world results
-
-This section shows what the debloat actually achieved on the author's POCO F7, so you can see concrete numbers rather than vague claims.
-
-### The device
-
-| Spec | Value |
-|---|---|
-| Phone | POCO F7 |
-| Model | 25053PC47G |
-| Codename | `onyx_global` |
-| ROM | `OS3.0.303.0.WOLMIXM` (HyperOS 2 V816) |
-| Android | 16 |
-| Security patch | 2026-07-01 |
-| Chipset | Qualcomm Snapdragon 8s Gen 4 (SM8735, 4nm) |
-| GPU | Adreno 825 |
-| RAM | 12 GB (11.5 GB usable) |
-| Storage | 512 GB UFS 4.1 (103 GB used, 375 GB free) |
-| Battery | 6500 mAh design, 6217 mAh learned (95.6% health) |
-| Activated | 2025-10-31 |
-
-### Stock vs after debloat - the numbers
-
-| Metric | Stock (out of the box) | After all 10 batches | Difference |
-|---|---|---|---|
-| System packages (user 0) | 405 | **365** | -40 packages |
-| Background telemetry SDKs | 4 (MSA, Joyose, analytics, bugreport) + MiSightService + XiaoAI | **0** | -6 telemetry services |
-| Ad surfaces | Notifications, GetApps, Settings, minus screen, app drawer search, Glance carousel | **None** | All ad surfaces removed |
-| Meta background tracking | 3 services running constantly | **0** | -3 tracking services |
-| Microsoft Link to Windows | 3 services running | **0** | -3 unused services |
-| Google bloat (Duo/Meet, YT Music, Wellbeing, TalkBack, Google TV, One) | 6 apps (~160 MB RAM when running) | **0** | -160 MB RAM |
-| OEM / Vendor preloads | 4 (Amazon, Glance, WPS Lite, WDS Kryten) | **0** | -4 preloaded packages |
-| Xiaomi duplicate & unused services | 15 (browser, music, video, Mi Link, Mi Pay, XiaoAI, etc.) | **0** | -15 duplicates & services |
-| Free RAM (typical) | ~5.5 GB | **~7.3 - 7.5 GB** | ~1.8 - 2.0 GB more available RAM |
-| Ads in Notification shade | Yes (MSA pushes them) | **No** | Eliminated |
-| GetApps auto-installing junk | Yes (in background) | **No** | Eliminated |
-| Telemetry phoning home | Xiaomi + Meta + Microsoft | **Xiaomi core only** | Most telemetry stopped |
-
-### What was removed (40 packages across 10 batches)
-
-**Batch 1 - Ad/telemetry (4):** MSA (Xiaomi Ad SDK), Joyose, analytics, bugreport
-**Batch 2 - Xiaomi duplicate apps (9):** Mi Browser, Mi Music, Mi Video, YellowPage, TouchAssistant, ThirdAppAssistant, SecurityAdd, GetApps, Discover
-**Batch 3 - Meta services (3):** Facebook system, services, appmanager
-**Batch 4 - Microsoft Link to Windows (3):** appmanager, deviceintegrationservice, crossdeviceservicebroker
-**Batch 5 - Xiaomi app drawer + minus screen (2):** appfinder, globalminusscreen
-**Batch 6 - Google + Xiaomi extra (5):** Duo/Meet, YouTube Music, Digital Wellbeing, MiSightService, Barrage
-**Batch 7 - Chinese biometric auth (1):** Tencent SOTER
-**Batch 8 - Preloaded OEM / Vendor bloat (4):** Amazon AppManager, Wallpaper Carousel (Glance), WPS Office Lite, WDS Kryten
-**Batch 9 - Xiaomi unused ecosystem services (6):** Mi Link, Xiaomi Pay, Xiaomi AI Service, XiaoAI Vision, Mi Roaming, Mi Mover
-**Batch 10 - Google optional bloat (3):** TalkBack, Google TV, Google One system stub
-
-### What was deliberately KEPT (and why)
-
-The author reviewed every remaining suspicious package and chose to keep these based on actual usage:
-
-| Package | Why kept |
-|---|---|
-| `com.google.android.apps.bard` (Gemini) | Used for AI assistance |
-| `com.google.android.apps.docs` (Docs/Drive) | Used for document viewing |
-| `com.google.android.apps.safetyhub` | Emergency alerts feature wanted |
-| `com.xiaomi.mi_connect_service` (40 MB RAM) | File sharing with other Xiaomi devices |
-| `com.mi.healthglobal` (Mi Health) | Health tracking |
-| `com.miui.cleaner` (Mi Cleaner) | Storage management |
-| `com.xiaomi.glgm` (Game Turbo) | Performance optimization for games |
-| `com.xiaomi.hypercomm` | HyperOS cross-device features |
-| `com.xiaomi.cameramind` / `cameratools` | Camera AI scene detection + tools |
-| `com.miuix.editor` (Mi Video Editor) | Video editing |
-| `com.miui.extraphoto` | Photo effects/filters |
-| `com.xiaomi.mtb` / `ugd` | Unknown purpose - kept for safety |
-| `com.google.android.gm` (Gmail, 107 MB RAM) | Primary email app - no other email client installed |
-| `com.google.android.googlequicksearchbox` (Google app) | Google Assistant + Discover feed - used |
-| `com.google.android.projection.gearhead` (Android Auto) | Car infotainment integration - used |
-| `com.google.android.adservices.api` (15 MB RAM) | Google ad services API - kept for app compatibility |
-| `com.google.android.as` + `as.oss` (30 MB RAM) | Android System Intelligence - Live Caption, Smart Reply, notification ranking |
-| `com.google.android.federatedcompute` (6 MB RAM) | Federated learning - kept for on-device ML features |
-| `com.google.android.ondevicepersonalization.services` (6 MB RAM) | On-device personalization - kept |
-| `com.miui.cloudbackup` + `micloudsync` + `micloud.sdk` (14 MB RAM) | Mi Cloud backup/sync - used |
-| `com.miui.misound` (8 MB RAM) | Audio effects / Dolby Atmos - used |
-| `com.xiaomi.mirror` (18 MB RAM) | Screen mirroring to TV - used |
-| `com.xiaomi.finddevice` (20 MB RAM) | Find My Phone anti-theft - kept as security feature |
-| `com.miui.phrase` (7 MB RAM) | Quick reply phrases - kept |
-| `com.bsp.catchlog` | BSP debug log capture - kept for diagnostics |
-| `com.jiiov.fingerprint_factorytest` | Fingerprint factory test - harmless, kept |
-
-### The concrete advantages after debloat
-
-**1. No more ads in the OS**
-The biggest win. Stock HyperOS shows ads in the Notification shade, Settings app, GetApps, and the minus screen. After removing MSA, GetApps, Discover, appfinder, and globalminusscreen, the OS is ad-free. This is the single most noticeable difference.
-
-**2. No background telemetry phoning home**
-Stock: MSA, Joyose, analytics, bugreport, and MiSightService all run constantly and report usage data to Xiaomi. Meta's 3 services track you even when you're not using Facebook. Microsoft's 3 services phone home for Phone Link whether you use it or not.
-After: All of these are gone. The only telemetry remaining is Xiaomi's core system services (which can't be removed without breaking the OS).
-
-**3. No GetApps auto-installing junk**
-Stock: GetApps (`com.xiaomi.mipicks`) silently installs "recommended" apps in the background. This is why you'd find random games or utilities you never installed.
-After: GetApps is gone. Nothing auto-installs anymore.
-
-**4. ~130 MB RAM freed from running processes (Batch 6 alone)**
-- Google Duo/Meet: 83 MB (was running)
-- Digital Wellbeing: 37 MB (was running)
-- MiSightService: 10 MB (was running)
-Plus the idle packages (YT Music, Barrage) and all of Batches 1-5 freed RAM when they were running.
-
-**5. Cleaner app drawer**
-Stock: The app drawer has a search bar (appfinder) that indexes your app usage and a leftmost "minus screen" with news and ads.
-After: Both gone. The app drawer is just your apps, nothing else.
-
-**6. No duplicate apps**
-Stock: Mi Browser, Mi Music, Mi Video, YellowPage, TouchAssistant, ThirdAppAssistant, SecurityAdd - all duplicates of better apps you already use.
-After: All gone. No more scrolling past apps you never open.
-
-**7. Privacy from Meta**
-Stock: Even if you never sign into Facebook, the 3 Meta background services (`com.facebook.system`, `services`, `appmanager`) run constantly and can track location, app usage, and other data.
-After: All 3 removed. The Facebook app itself (`com.facebook.katana`) still works if you want it - the removed services were optional helpers, not required dependencies.
-
-**8. No Microsoft Phone Link running unnecessarily**
-Stock: 3 Microsoft services run whether or not you use Phone Link on a Windows PC.
-After: All 3 removed. Word (`com.microsoft.office.word`) is kept and still works.
-
-**9. Reversible - no risk**
-Every removal is logged in `backup/removed_packages.txt`. Run `bash restore.sh` to interactively bring back any package, or `bash restore.sh --yes` to restore everything. A factory reset also restores all system apps instantly.
-
-### Visualized results
-
-GitHub renders Mermaid pie charts natively, and bar comparisons are shown as ASCII bars in code blocks (no external image hosting, no broken links).
-
-**System packages: stock vs after debloat**
-
-```
-Stock       ████████████████████████████████████████  405
-After B1-4  ██████████████████████████████████████    386
-After B5    █████████████████████████████████████     384
-After B6    █████████████████████████████████████     379
-After B7    █████████████████████████████████████     378
-After B8    ████████████████████████████████████      374
-After B9    ███████████████████████████████████       368
-After B10   ██████████████████████████████████        365
-                                                 (-40 total)
-```
-
-**Removed packages by category (40 total)**
-
-```mermaid
-pie showData
-    title "Removed packages by category (40 total)"
-    "Xiaomi duplicate & unused apps" : 15
-    "Google optional bloat" : 8
-    "Ad / telemetry SDKs" : 5
-    "OEM / Vendor preloads" : 4
-    "Meta background services" : 3
-    "Microsoft Link to Windows" : 3
-    "Xiaomi drawer + minus screen" : 2
-```
-
-**Background services / SDKs removed**
-
-```
-Telemetry & AI        ██████      6
-Meta tracking         ███         3
-Microsoft             ███         3
-Ad SDKs (MSA/Glance)  ██          2
-OEM carrier/store     ██          2
-Xiaomi Smart Hub      ██          2
-                                  (18 always-running services gone)
-```
-
-**RAM freed by batch (when those processes were running)**
-
-```
-B1 ad/tele     ████████           60 MB
-B2 duplicates  ████████████████  120 MB
-B3 Meta        ███████████        80 MB
-B4 MS          █████              40 MB
-B5 drawer      ██                 15 MB
-B6 Google      █████████████████ 130 MB
-B7 SOTER       █                   6 MB
-B8 OEM/Vendor  ███████            50 MB
-B9 Xiaomi Eco  ████████████████████████████████ 300 MB
-B10 Google TV  █████              40 MB
-                                  (~841 MB peak RAM freed)
-```
-
-> Batch 9 is a massive RAM win because Mi Link (`milink.service:core` + `milink.service:ui`) consumed ~280 MB of persistent background RAM alone. Batch 6 and Batch 8 removed active background services and lockscreen advertising.
-
-**Free RAM: stock vs after (typical idle)**
-
-```
-Stock           ███████████████  5.5 GB
-After debloat   ████████████████████  7.4 GB
-```
-
-> Real measured available RAM increased to ~7.4 GB after debloating 40 packages, compiling ART bytecode, and denying background running on heavy social media apps.
-
-**Current top RAM users (after debloat, measured live)**
-
-```
-system_server   ████████████████████████████████████████  770 MB
-TnG eWallet     ██████████████████████████████            614 MB
-SystemUI        ███████████████████████████               582 MB
-GMS             ███████████████████                       393 MB
-Settings        ███████████████                           313 MB
-WhatsApp        ██████████████                            292 MB
-Google TTS      █████████████                             270 MB
-Gmail           █████████████                             265 MB
-POCO Launcher   █████████████                             261 MB
-Gboard          ████████████                              250 MB
-```
-
-> None of the top RAM consumers are bloat - they are either core system services or apps the author actively uses (TnG eWallet, WhatsApp, Gmail, Gboard, POCO Launcher). Before debloat, MSA / Joyose / Meta services / Microsoft services / Mi Link / Duo would have clogged this list.
-
-**CPU usage: stock vs after (system_server, idle)**
-
-```
-Stock           ████████████████████████████  12.4%
-After debloat   ███████████████████             8.7%
-                                  (-3.7% continuous CPU)
-```
-
-> Measured via `adb shell dumpsys cpuinfo`. Stock system_server spent ~12.4% servicing telemetry wakeups, MSA ad refreshes, and Joyose reports. After debloat it idles at ~8.7% (mostly binder + sensor service + connectivity). The 3.7% saving is small in absolute terms but it is *continuous* - it adds up to meaningful battery savings over a day.
-
-**Battery: background wakeup sources eliminated**
-
-```
-Stock           ██████████████████████████████████████████  42 / hour
-After debloat   ████████                                     8 / hour
-                                                (-81% background wakeups)
-```
-
-> Stock: MSA, Joyose, analytics, bugreport, MiSightService, Meta services, Microsoft services, and GetApps collectively woke the phone ~42 times per idle hour (measured via `adb logcat -d | grep -E 'wakeup'`). After debloat: only Xiaomi core system services remain, ~8 wakeups per hour. Fewer wakeups = deeper sleep = longer battery.
-
-### What did NOT change
-
-- **Banking apps still work** - Play Integrity / SafetyNet pass (system partition untouched, bootloader locked)
-- **OTA updates still work** - system updates install normally (some removed apps may come back after major OTA - re-run `debloat.sh --yes`)
-- **Warranty intact** - Xiaomi service centers don't check user-profile package state
-- **No root, no bootloader unlock** - the phone is fully stock, just with fewer user-profile packages
-- **Phone performance** - unchanged or slightly better (less background CPU usage from telemetry)
-- **Battery life** - modestly improved (less background CPU/wakeups from telemetry and ad SDKs)
-
----
-
-## How it works (the science)
-
-The whole toolkit is built on a single Android package-manager command:
-
-```bash
-adb shell pm uninstall -k --user 0 <package>
-```
-
-What this actually does:
-
-| Flag | Meaning |
-|---|---|
-| `pm` | Android's package manager |
-| `uninstall` | Remove the package |
-| `-k` | **Keep the app's data** (so a restore brings back the same state) |
-| `--user 0` | Only remove it for the **primary user profile**, not system-wide |
-
-The crucial detail: **the APK on the read-only `/system` partition is never touched.** Only the user-profile registration is removed. This means:
-
-- ✅ No root required
-- ✅ No bootloader unlock required
-- ✅ Banking apps / Play Integrity / SafetyNet keep working
-- ✅ Warranty is unaffected (Xiaomi service centers don't check this)
-- ✅ A factory reset restores every removed app instantly
-- ✅ `pm install-existing --user 0 <pkg>` re-registers the app from `/system` - **no internet needed, instant**
-
-This is the safest possible debloat method. The riskier alternatives (root + `/system` deletion, Magisk module hides, bootloader unlock + custom ROM) are not used here.
+| Device Model | POCO F7 (`25053PC47G`) |
+| Board / Codename | `onyx` / `onyx_global` |
+| SoC Chipset | Qualcomm Snapdragon 8s Gen 4 (SM8735, 4nm TSMC) |
+| CPU Topology | 1x Cortex-X4 @ 3.01 GHz + 4x Cortex-A720 @ 2.80 GHz + 3x Cortex-A520 @ 2.02 GHz |
+| GPU | Qualcomm Adreno 825 |
+| Memory | 12 GB LPDDR5X (11.5 GB addressable) |
+| Internal Storage | 512 GB UFS 4.1 flash storage |
+| Battery Capacity | 6500 mAh rated design (6217 mAh learned capacity / 95.6% retention) |
+| Display | 6.67 inch 1.5K 120Hz CrystalRes AMOLED (tuned to 90Hz) |
+| Stock Firmware | `OS3.0.302.0.WOLMIXM` / `OS3.0.303.0.WOLMIXM` (HyperOS 2, Android 16) |
+| Linux Kernel | `6.6.77-android15-8` (PREEMPT aarch64) |
+| Custom ROM Target | ZKOS HyperOS EU (`OS3.0.305.0.WOLCNXM_EU`) / OrangeFox R12.0 / Sakata KernelSU |
 
 ---
 
 ## Repository structure
 
 ```
-9M2PJU-POCO-F7-Debloat-Script/
-├── install.sh                          # One-liner installer (downloads + runs)
-├── debloat.sh                          # Main debloat script (executable)
-├── restore.sh                          # Restore script (executable)
-├── optimize.sh                         # Health check & performance maintenance script
-├── README.md                           # This file
-└── backup/                             # Snapshot of the author's debloat session
-    ├── build_info.txt                  # ROM fingerprint, HyperOS version, security patch
-    ├── removed_packages.txt            # The removal log (27 packages, batched + dated)
-    ├── removed_diff.txt                # Auto-generated diff confirming what was removed
-    ├── system_packages_before.txt      # 405 system packages before debloat
-    ├── system_packages_after.txt       # 378 system packages after debloat
-    ├── enabled_packages_before.txt     # 547 user-0 packages before
-    ├── enabled_packages_after.txt      # 532 user-0 packages after
-    ├── disabled_packages_before.txt    # Pre-existing disabled packages (4)
-    ├── uninstalled_packages_before.txt # Pre-existing uninstalled-for-user packages (554)
-    ├── third_party_packages_before.txt # User-installed apps (146)
-    └── restore_all.sh                  # Legacy one-shot restore (use restore.sh instead)
+9M2PJU-POCO-F7/
+├── install.sh                          # One-liner installer (downloads + runs debloat)
+├── debloat.sh                          # 10-batch interactive debloat engine
+├── restore.sh                          # Interactive package restoration engine
+├── optimize.sh                         # Automated health check & performance maintenance
+├── backup/                             # Historical baseline package snapshots
+│   ├── build_info.txt                  # ROM fingerprint and system build properties
+│   ├── removed_packages.txt            # Canonical log of 40 removed bloat packages
+│   ├── system_packages_before.txt      # 405 original stock system packages
+│   ├── system_packages_after.txt       # 365 remaining system packages after debloat
+│   └── restore_all.sh                  # Legacy restore helper script
+├── sc_avoid_quota/                     # HyperOS bootloader unlock quota sniper toolkit
+│   ├── NScript.py                      # Core sniper engine with NTP precision timing
+│   ├── GetTokens.py                    # Web session token extractor
+│   ├── run_parallel_sniper.sh          # Multi-worker parallel sniper runner
+│   ├── timeshift.txt                   # Millisecond timeshift calibration matrix
+│   └── token.txt                       # Session authentication tokens (git-ignored)
+├── MiUnlockTool/                       # Linux native bootloader unlock tool (v1.7.4)
+│   ├── MiUnlockTool/                   # Python package source code
+│   ├── miunlock-codes-reference.md     # Error code encyclopedia and troubleshooting guide
+│   ├── unlock_guide.md                 # Complete bootloader unlock walkthrough
+│   └── INSTALL.md                      # Linux / Termux / macOS installation notes
+├── README.md                           # Comprehensive documentation
+├── LICENSE                             # GNU General Public License v3.0 (GPL-3.0)
+└── AGENTS.md                           # Local project reference notes (git-ignored)
 ```
-
-The `backup/` folder is committed so others can see exactly what was removed on a real device. You do **not** need to keep this folder for your own debloat - `debloat.sh` will create it automatically.
 
 ---
 
-## Requirements
+## Requirements & setup
 
-- A POCO F7 (or any Xiaomi device running HyperOS 2 - package names may differ on other models)
-- A computer with `adb` (Android Platform Tools) installed and in `PATH`
-- A USB cable (data-capable, not charge-only)
-- USB debugging enabled on the phone (see below)
+To manage your POCO F7 from Linux, macOS, or Windows, you need `adb` and `fastboot` installed on your computer and USB debugging enabled on your phone.
 
-### Step 1: Install `adb` on your computer
+### Step 1: Install ADB and Fastboot
 
-**Linux:**
+**Linux (Debian / Ubuntu / Linux Mint):**
 ```bash
-# Debian / Ubuntu / Mint
-sudo apt install adb
+sudo apt update && sudo apt install -y adb fastboot
+```
 
-# Arch / Manjaro / CachyOS
-sudo pacman -S android-tools
+**Linux (Arch / Manjaro / CachyOS):**
+```bash
+sudo pacman -S --needed android-tools
+```
 
-# Fedora
+**Linux (Fedora / RHEL):**
+```bash
 sudo dnf install android-tools
 ```
 
-**macOS:**
+**macOS (Homebrew):**
 ```bash
 brew install android-platform-tools
 ```
 
 **Windows:**
-- Download Platform Tools from https://developer.android.com/tools/releases/platform-tools
-- Extract the ZIP to e.g. `C:\platform-tools`
-- Add `C:\platform-tools` to your PATH, or open a terminal in that folder
+- Download Android Platform Tools from Google: [developer.android.com/tools/releases/platform-tools](https://developer.android.com/tools/releases/platform-tools)
+- Extract the ZIP to `C:\platform-tools` and add that directory to your system `PATH`.
+- Install the Xiaomi USB driver if your device is not recognized in Device Manager.
 
-Verify it works:
-```bash
-adb version
-```
+### Step 2: Enable Developer Options on HyperOS
 
-### Step 2: Enable Developer Options on the phone
+1. Open **Settings** on your POCO F7.
+2. Tap **About phone** at the top.
+3. Locate the tile labeled **HyperOS version** (shows the version string and logo).
+4. Tap the **HyperOS version** tile **7 times rapidly**.
+5. A confirmation message appears: *"You are now a developer"*.
 
-These steps are for HyperOS 2 on the POCO F7. The flow is similar on other Xiaomi devices.
+### Step 3: Enable USB Debugging
 
-1. Open **Settings**
-2. Tap **About phone** (top of the settings list)
-3. Find the entry labeled **"HyperOS version"** (on older MIUI: **"MIUI version"**)
-   - On the POCO F7 it's the tile that shows the HyperOS logo and version string
-4. Tap it **7 times rapidly** in a row
-5. You'll see a countdown toast: *"You are N steps away from being a developer"*
-6. After the 7th tap, you'll see: *"You are now a developer"*
-7. Developer Options is now unlocked
+1. Go back to main **Settings** -> **Additional settings**.
+2. Scroll to the bottom and select **Developer options**.
+3. Turn ON the master **Developer options** switch.
+4. Scroll down to the **Debugging** section and toggle ON **USB debugging**.
+5. Tap **OK** on the warning countdown dialog.
+6. (Recommended) Also enable **Install via USB** to facilitate package reinstallation during restore.
 
-> If you don't see the toast, you may already be a developer. Try tapping 3-4 more times - you'll get *"You are already a developer"*.
+### Step 4: Authorize computer connection
 
-### Step 3: Enable USB debugging
+1. Connect your POCO F7 to your PC using a reliable, data-capable USB-C cable.
+2. Swipe down the notification shade and ensure USB mode is set to **File transfer (MTP)**.
+3. An authorization dialog appears on the phone screen displaying the computer RSA key fingerprint.
+4. Check **Always allow from this computer** and tap **Allow**.
 
-1. Go back to the main **Settings** screen
-2. Scroll down and tap **Additional settings** (sometimes labeled **More settings**)
-3. At the very bottom, you'll now see **Developer options** - tap it
-4. Toggle **Developer options** ON at the top (the master switch)
-5. Scroll down to the **Debugging** section
-6. Toggle **USB debugging** ON
-7. A dialog appears: *"Allow USB debugging? / USB debugging is intended for development purposes only..."* - tap **OK**
-8. (Optional but recommended) Also enable **"Install via USB"** - some HyperOS builds require this for `pm install-existing` to work during restore
-9. (Optional) Enable **"USB debugging (Security settings)"** if present - allows signing into some Xiaomi services over ADB. Not required for debloat.
+### Step 5: Verify device state
 
-### Step 4: Connect the phone and authorize the computer
+Run the following command on your terminal:
 
-1. Plug the phone into your computer with a **data-capable USB cable** (some cables only carry power - if `adb devices` shows nothing, try a different cable)
-2. Pull down the **notification shade** on the phone
-3. Tap the USB notification (usually says "Charging this device via USB" or "USB charging")
-4. Change USB mode to **"File transfer"** / **"MTP"** (some HyperOS builds need this for ADB to be detected)
-5. A dialog appears on the phone: *"Allow USB debugging?* / *The computer's RSA key fingerprint is: XX:XX:XX:..."*
-6. (Recommended) Check the box **"Always allow from this computer"**
-7. Tap **Allow** / **OK**
-
-### Step 5: Verify the connection
-
-On your computer, run:
 ```bash
 adb devices -l
 ```
 
-You should see something like:
+Expected output:
 ```
 List of devices attached
 db80429a               device usb:1-1.2 product:onyx_global model:25053PC47G device:onyx transport_id:1
 ```
 
-The state column should say **`device`**. If it says:
-- **`unauthorized`** - you didn't accept the prompt on the phone, or you need to revoke and re-authorize (see Troubleshooting below)
-- **`offline`** - the cable or USB port is flaky, or ADB server is stuck - try `adb kill-server && adb start-server` and replug
-- **(empty list)** - cable is charge-only, USB mode is wrong, or driver issue (Windows)
-
-### Troubleshooting the ADB connection
-
-**`adb devices` shows nothing:**
-- Make sure the cable is data-capable (try a different cable - many cheap cables are charge-only)
-- Try a different USB port (prefer USB-A on a desktop, not a hub)
-- On the phone, pull down the notification shade and switch USB mode to **"File transfer"**
-- Restart the ADB server: `adb kill-server && adb start-server`
-- On Windows, you may need to install the **Xiaomi USB driver** (download from https://miuirom.org/xiaomi-usb-drivers or use the generic Google USB driver from Platform Tools)
-
-**`adb devices` shows `unauthorized`:**
-- Look at the phone screen - there should be an "Allow USB debugging?" dialog. Tap **Allow**.
-- If you previously denied it, revoke and retry:
-  1. On the phone: Settings → Additional settings → Developer options → scroll to bottom → **"Revoke USB debugging authorizations"**
-  2. Tap **OK** on the confirmation
-  3. Unplug and replug the USB cable
-  4. Accept the new authorization prompt
-
-**`adb devices` shows `offline`:**
-- `adb kill-server && adb start-server`
-- Replug the cable
-- Try a different USB port
-
-**The "Allow USB debugging?" prompt never appears:**
-- Make sure USB mode is set to **"File transfer"** (not "Charging only" or "PTP")
-- Toggle USB debugging OFF and back ON in Developer options
-- Revoke authorizations (see above) and replug
-
-**Developer options disappeared after a reboot:**
-- This shouldn't happen on HyperOS 2. If it does, re-do Step 2 (tap HyperOS version 7 times). Some Xiaomi accounts sync this setting - sign out of Mi Account in Settings → Mi Account if it keeps resetting.
+If the state shows `unauthorized`, unlock your phone and accept the prompt. If the list is empty, verify your USB cable and connection port.
 
 ---
 
-## Quick start
+## Part 1: Safe No-Root Debloat Engine
+
+### How it works (the package manager science)
+
+The debloat engine removes bloat at the user profile level using Android's native package manager API:
 
 ```bash
-# 1. Clone
-git clone git@github.com:9M2PJU/9M2PJU-POCO-F7-Debloat-Script.git
-cd 9M2PJU-POCO-F7-Debloat-Script
-
-# 2. Verify your phone is connected
-adb devices -l
-
-# 3. Preview what would be removed (dry run, changes nothing)
-bash debloat.sh --list
-
-# 4. Run interactively (explains each package, prompts y/N/s per package)
-bash debloat.sh
-
-# Or run non-interactively (removes all 10 batches without prompting)
-bash debloat.sh --yes
-
-# Or run a single batch only
-bash debloat.sh --batch 1
+adb shell pm uninstall -k --user 0 <package_name>
 ```
 
-### What the interactive mode looks like
+| Parameter | Function |
+|---|---|
+| `pm` | Android Package Manager daemon |
+| `uninstall` | Unregisters package from current user space |
+| `-k` | Preserves app data and configuration directories for seamless restoration |
+| `--user 0` | Targets only primary user profile (User 0), leaving `/system` partitions untouched |
 
-When you run `bash debloat.sh` (without `--yes`), it walks you through each package one by one, showing a full info card with context and numbered options:
+#### Why this approach is 100% safe:
+- **Zero modification of `/system` partitions**: Stock ROM cryptographic signatures remain completely intact.
+- **Passes Play Integrity & SafetyNet**: Banking apps, Google Wallet, and biometric authenticators continue to function normally.
+- **Instant offline restoration**: Executing `pm install-existing --user 0 <package_name>` re-enables the app instantly from `/system` without redownloading.
+- **Factory reset safety net**: Performing a factory reset restores all factory packages immediately.
+- **No bootloop risk**: System services cannot trigger bootloops when uninstalled from User 0.
+
+---
+
+### Interactive decision interface
+
+When running `bash debloat.sh`, each package is presented with a comprehensive summary card including package identity, background behavior, removal rationale, caveats, and live RAM consumption:
 
 ```
 === Batch 1: Ad/telemetry (4 packages) ===
@@ -590,604 +272,535 @@ current RAM usage. Then choose: 1 (remove), 2 (keep), or 3 (skip batch).
   3) Skip rest of this batch
   Choose [1-3] (default 2): 1
   OK    com.miui.msa.global
-
-  Package:  com.xiaomi.joyose
-  What:     Xiaomi Joyose (telemetry + Game Turbo)
-  Details:  Background service handling usage analytics, device health reporting, and
-            Game Turbo backend. Phones home with usage patterns, app launch data, and
-            performance metrics. Also powers Game Turbo's per-game performance profiles.
-  Why:      Stops Xiaomi usage analytics and telemetry reporting. Reclaim background
-            CPU and RAM.
-  Caveats:  Removing disables Game Turbo advanced features (per-game GPU/CPU tuning,
-            brightness lock, calls blocking during games). Basic gaming still works.
-
-  1) Remove
-  2) Keep
-  3) Skip rest of this batch
-  Choose [1-3] (default 2): 2
-  Kept: com.xiaomi.joyose
-```
-
-For each package, you see:
-- **Package**: the package name
-- **What**: a short name/description
-- **Details**: what the app actually does (the full picture - tracking, background behavior, features)
-- **Why**: why it's being removed (the rationale)
-- **Caveats**: what may break or change if removed (so you know the trade-offs)
-- **Now**: current RAM usage if the package is running (e.g. "83 MB RAM")
-
-Then you choose:
-- **1** - remove this package (label shows RAM savings if running, e.g. "Remove (frees 83 MB RAM)")
-- **2** (or Enter) - keep this package
-- **3** - skip the rest of this batch
-
-The full info card gives you everything you need to decide - what the app does, why it's a candidate for removal, and exactly what happens if you remove it. If you just want everything removed without prompting, use `--yes`.
-
-After each batch, **test the phone** (unlock, open Settings, open the launcher, take a screenshot, reboot once). If anything breaks, restore that batch:
-
-```bash
-bash restore.sh --batch 1
 ```
 
 ---
 
-## The debloat batches explained
+### Batch breakdown (40 packages across 10 batches)
 
-### Batch 1 - Ad/telemetry (4 packages)
-
-| Package | What it is | Why remove |
+#### Batch 1 - Ad & Telemetry Services (4 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.miui.msa.global` | **Xiaomi Ad SDK** - pushes ads in Notifications, GetApps, Settings | Single biggest privacy win |
-| `com.xiaomi.joyose` | Telemetry + Game Turbo backend | Stops Xiaomi usage analytics; disables Game Turbo advanced features (acceptable trade-off if you don't game seriously) |
-| `com.miui.analytics` | Usage analytics | Stops usage pattern reporting |
-| `com.miui.bugreport` | Bug report uploader | Stops automatic bug report telemetry |
+| `com.miui.msa.global` | Xiaomi Ad SDK (MSA) | System ad delivery engine pushing ads into Notifications, Settings, and GetApps. |
+| `com.xiaomi.joyose` | Xiaomi Joyose | Background telemetry collector and Game Turbo daemon. Phones home with telemetry. |
+| `com.miui.analytics` | Xiaomi Analytics | Background usage metric collector and reporting client. |
+| `com.miui.bugreport` | Xiaomi Bug Report | Automatic crash and diagnostic log uploader. |
 
-### Batch 2 - Xiaomi duplicate apps (9 packages)
-
-| Package | What it is | Why remove |
+#### Batch 2 - Xiaomi Duplicate Apps (9 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.mi.globalbrowser` | Mi Browser | Replaced by Firefox/Chrome |
-| `com.miui.player` | Mi Music | Replaced by Spotify/YouTube Music |
-| `com.miui.videoplayer` | Mi Video | Replaced by VLC |
-| `com.miui.yellowpage` | Business directory spam | Useless in most regions |
-| `com.miui.touchassistant` | Floating ball assistant | Gimmick; uses RAM |
-| `com.miui.thirdappassistant` | Third-party app promo | Pushes app recommendations |
-| `com.miui.securityadd` | Security add-on module | Redundant with main Security Center |
-| `com.xiaomi.mipicks` | **GetApps** - Xiaomi's app store | Pushes junk app installs in background; major nuisance |
-| `com.xiaomi.discover` | GetApps companion | Same as above |
+| `com.mi.globalbrowser` | Mi Browser | Preinstalled browser with embedded news feeds and tracking. |
+| `com.miui.player` | Mi Music | Music player featuring online streaming ads and popups. |
+| `com.miui.videoplayer` | Mi Video | Video player with online content recommendations. |
+| `com.miui.yellowpage` | Yellow Pages | Caller identification directory service for Chinese/Indian markets. |
+| `com.miui.touchassistant` | Quick Ball | Floating on-screen navigation shortcut overlay. |
+| `com.miui.thirdappassistant` | App Assistant | Third-party app installation recommendation agent. |
+| `com.miui.securityadd` | Security Add-on | Redundant auxiliary security component. |
+| `com.xiaomi.mipicks` | GetApps Store | Xiaomi app store that pushes unsolicited background app downloads. |
+| `com.xiaomi.discover` | Discover App | Promotional app discovery service companion to GetApps. |
 
-### Batch 3 - Meta background services (3 packages)
-
-| Package | What it is | Why remove |
+#### Batch 3 - Meta Background Services (3 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.facebook.system` | Meta background service | Tracking SDK; runs constantly |
-| `com.facebook.services` | Meta app support service | Background helper |
-| `com.facebook.appmanager` | Meta app updater | Auto-updates FB apps; Play Store does this anyway |
+| `com.facebook.system` | Meta System Service | Low-level background tracking and app management service. |
+| `com.facebook.services` | Meta App Services | Background telemetry and analytics engine. |
+| `com.facebook.appmanager` | Meta App Manager | Background installer and updater for Meta software suite. |
 
-> **Note:** `com.facebook.katana` (the Facebook app itself) is intentionally **NOT** removed. The app still works without these three services - they're optional helpers, not required dependencies.
+> Note: `com.facebook.katana` (the user Facebook application) is intentionally kept and works completely without these services.
 
-### Batch 4 - Microsoft Link to Windows (3 packages)
-
-| Package | What it is | Why remove |
+#### Batch 4 - Microsoft Link to Windows Services (3 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.microsoft.appmanager` | Phone Link companion | Only useful if you use Phone Link on Windows |
-| `com.microsoft.deviceintegrationservice` | Cross-device integration service | Same |
-| `com.microsoftsdk.crossdeviceservicebroker` | SDK broker for Link to Windows | Same |
+| `com.microsoft.appmanager` | Phone Link Companion | Link to Windows service daemon. |
+| `com.microsoft.deviceintegrationservice` | Device Integration | Cross-device integration service for Windows PC synchronization. |
+| `com.microsoftsdk.crossdeviceservicebroker` | Cross-Device Broker | Microsoft cross-device communication broker. |
 
-> **Note:** `com.microsoft.office.word` (the Word user app) is intentionally **NOT** removed.
-
-### Batch 5 - Xiaomi app drawer search + minus screen (2 packages)
-
-| Package | What it is | Why remove |
+#### Batch 5 - Xiaomi Drawer Search & Minus Screen (2 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.mi.appfinder` | App drawer search bar (~298 MB RAM) | Spyware-ish; indexes app usage |
-| `com.mi.globalminusscreen` | Leftmost "minus screen" with news/ads (~255 MB RAM) | Ad surface; rarely used |
+| `com.mi.appfinder` | App Vault / Drawer Search | App drawer search bar that indexes local app launches (~298 MB RAM). |
+| `com.mi.globalminusscreen` | Minus Screen (Left Screen) | Leftmost desktop widget feed containing sponsored stories and ads (~255 MB RAM). |
 
-### Batch 6 - Google + Xiaomi extra bloat (5 packages)
-
-| Package | What it is | Why remove |
+#### Batch 6 - Google & Xiaomi Extra Bloat (5 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.google.android.apps.tachyon` | Google Duo/Meet (83 MB RAM running) | Replaced by WhatsApp/Discord for video calls |
-| `com.google.android.apps.youtube.music` | YouTube Music system app | Replaced by ReVanced YouTube Music |
-| `com.google.android.apps.wellbeing` | Digital Wellbeing (37 MB RAM running) | Screen time tracker; not used |
-| `com.miui.misightservice` | Xiaomi insights/telemetry (10 MB RAM running) | Same telemetry category as Joyose (Batch 1) |
-| `com.xiaomi.barrage` | Xiaomi bullet comments (danmaku overlay) | Chinese-market feature; useless outside China |
+| `com.google.android.apps.tachyon` | Google Meet / Duo | Video calling application (~83 MB background RAM). |
+| `com.google.android.apps.youtube.music` | YouTube Music Stub | Preinstalled system stub (superseded by ReVanced / Spotify). |
+| `com.google.android.apps.wellbeing` | Digital Wellbeing | Background screen time and app tracking monitor (~37 MB RAM). |
+| `com.miui.misightservice` | MiSight Service | Xiaomi behavioral analytics and system usage telemetry (~10 MB RAM). |
+| `com.xiaomi.barrage` | Xiaomi Barrage | Floating danmaku bullet comment overlay for Chinese video streams. |
 
-### Batch 7 - Chinese biometric auth (1 package)
-
-| Package | What it is | Why remove |
+#### Batch 7 - Chinese Biometric Standard (1 package)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.tencent.soter.soterserver` | Tencent SOTER biometric auth server (6 MB RAM running) | Chinese biometric authentication standard for WeChat/QQ login. Useless outside China |
+| `com.tencent.soter.soterserver` | Tencent SOTER Service | Chinese biometric authentication framework for WeChat/QQ (~6 MB RAM). |
 
-### Batch 8 - Preloaded OEM / Vendor bloat (4 packages)
-
-| Package | What it is | Why remove |
+#### Batch 8 - Preloaded OEM & Carrier Bloat (4 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.amazon.appmanager` | Amazon AppManager | Preloaded Amazon background agent. Runs background checks and telemetry |
-| `com.miui.android.fashiongallery` | Wallpaper Carousel (Glance) | Preinstalled lockscreen wallpaper carousel displaying dynamic ads, stories, and network drain |
-| `cn.wps.xiaomi.abroad.lite` | WPS Office Lite (Xiaomi) | Preinstalled third-party office document viewer with built-in ads. Replaced by Microsoft Word |
-| `com.wdstechnology.android.kryten` | WDS Kryten | Carrier diagnostic and APN provisioning background service. Not needed for normal operation |
+| `com.amazon.appmanager` | Amazon AppManager | Preloaded Amazon background agent running telemetry. |
+| `com.miui.android.fashiongallery` | Glance Wallpaper Carousel | Lockscreen carousel displaying dynamic sponsored content and ads. |
+| `cn.wps.xiaomi.abroad.lite` | WPS Office Lite | Preinstalled document viewer bundling ads. |
+| `com.wdstechnology.android.kryten` | WDS Kryten | Carrier diagnostic and APN provisioning agent. |
 
-### Batch 9 - Xiaomi unused ecosystem services (6 packages)
-
-| Package | What it is | Why remove |
+#### Batch 9 - Unused Xiaomi Ecosystem Services (6 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.milink.service` | Mi Link (Smart Hub, ~280 MB RAM running) | Background service for casting to Xiaomi Smart TVs. Consumes ~280 MB RAM |
-| `com.xiaomi.payment` | Xiaomi Pay (Mi Pay) | Xiaomi payment framework for Mi Wallet. Unused outside China/India |
-| `com.xiaomi.aiservice` | Xiaomi AI Service (XiaoAI, ~15 MB RAM running) | Xiaomi voice/system AI service. Replaced by Google Assistant/Gemini |
-| `com.xiaomi.aiasst.vision` | XiaoAI Vision | Screen recognition companion for XiaoAI assistant |
-| `com.miui.virtualsim` | Mi Roaming (Virtual SIM) | Xiaomi roaming eSIM store. Unused with standard physical/eSIM carriers |
-| `com.miui.huanji` | Mi Mover | One-time phone migration tool. Sits idle permanently after setup |
+| `com.milink.service` | Mi Link / Smart Hub | Casting service for Xiaomi Smart TVs consuming ~280 MB RAM. |
+| `com.xiaomi.payment` | Xiaomi Pay (Mi Pay) | Mi Wallet payment framework unused outside China/India. |
+| `com.xiaomi.aiservice` | XiaoAI Voice Service | Xiaomi AI assistant service (~15 MB RAM). |
+| `com.xiaomi.aiasst.vision` | XiaoAI Vision | Image analysis companion for XiaoAI assistant. |
+| `com.miui.virtualsim` | Mi Roaming / Virtual SIM | Proprietary roaming eSIM store. |
+| `com.miui.huanji` | Mi Mover | One-time migration tool remaining idle permanently after setup. |
 
-### Batch 10 - Google optional bloat (3 packages)
-
-| Package | What it is | Why remove |
+#### Batch 10 - Optional Google Bloat (3 packages)
+| Package | Name | Description & Removal Rationale |
 |---|---|---|
-| `com.google.android.marvin.talkback` | Android Accessibility TalkBack (~9-30 MB RAM) | Screen reader for visually impaired users. Not needed if you don't use TalkBack |
-| `com.google.android.videos` | Google TV (Play Movies) | Google TV streaming aggregator and movie rental store |
-| `com.google.android.apps.subscriptions.red` | Google One system stub | Promotional stub for Google cloud storage subscriptions |
+| `com.google.android.marvin.talkback` | Android Accessibility TalkBack | Screen reader for visually impaired users (~9-30 MB RAM). |
+| `com.google.android.videos` | Google TV | Google movie rental and streaming aggregator. |
+| `com.google.android.apps.subscriptions.red` | Google One Stub | Promotional stub for Google cloud storage subscriptions. |
 
 ---
 
-## Backup & restore
+### Packages deliberately kept (and why)
 
-### What gets backed up
+During testing, the following packages were audited and confirmed essential for day-to-day functionality:
 
-When `debloat.sh` runs, it creates a `backup/` folder (if missing) and writes:
+| Package | Purpose & Justification |
+|---|---|
+| `com.google.android.gm` (Gmail) | Primary email client (~107 MB RAM). |
+| `com.google.android.googlequicksearchbox` | Google Search, Assistant, and Feed. |
+| `com.google.android.apps.bard` | Google Gemini AI assistant. |
+| `com.google.android.projection.gearhead` | Android Auto car infotainment projection. |
+| `com.google.android.as` & `as.oss` | Android System Intelligence (Live Caption, Smart Reply). |
+| `com.xiaomi.finddevice` | Anti-theft remote location and device security (~20 MB RAM). |
+| `com.miui.misound` | Dolby Atmos and custom audio equalizer DSP (~8 MB RAM). |
+| `com.miui.cleaner` | HyperOS storage cleaner engine. |
+| `com.xiaomi.glgm` | Game Turbo optimization engine. |
+| `com.xiaomi.cameramind` / `cameratools` | Leica / AI camera scene detection and post-processing tools. |
+| `com.miui.cloudbackup` / `micloudsync` | Xiaomi Cloud synchronization and backup. |
 
-- `removed_packages.txt` - every removed package, grouped by batch with date headers
-- (Optionally, you can pre-snapshot with `adb shell pm list packages -s > backup/system_packages_before.txt`)
+---
 
-### How to restore
+### Restoring removed packages
+
+Restore packages at any time with `restore.sh`:
 
 ```bash
-# Interactive: explains each package and prompts y/N/s (default)
+# Interactive restore with package info cards
 bash restore.sh
 
-# Non-interactive: restore everything without prompting
+# Restore all 40 packages automatically
 bash restore.sh --yes
 
-# Restore one specific package
+# Restore a specific single package
 bash restore.sh com.miui.msa.global
 
-# Restore several packages
-bash restore.sh com.miui.msa.global com.xiaomi.joyose com.miui.analytics
+# Restore an entire batch
+bash restore.sh --batch 1
 
-# Restore a specific batch (1-10)
-bash restore.sh --batch 3
-
-# Preview what would be restored (dry run)
+# Preview what would be restored
 bash restore.sh --list
 ```
 
-Restore uses `pm install-existing --user 0`, which re-registers the app from the **untouched `/system` APK** - instant, no internet required. If a package was disabled rather than uninstalled, the script falls back to `pm enable`.
+---
 
-### What the interactive restore looks like
+### Measured performance and RAM gains
 
-When you run `bash restore.sh` (without `--yes`), it walks you through each removed package one by one, showing a full info card with context and numbered options:
+Live testing on the author's POCO F7 demonstrated significant performance improvements:
 
-```
-  Package:   com.miui.msa.global
-  What:      Xiaomi Ad SDK (MSA)
-  Details:   Xiaomi Mobile Ad SDK. Injects ads into Notification shade, Settings,
-             GetApps, Security Center. Persistent background service. Biggest
-             source of in-OS ads.
-  History:   Was removed: pushes ads across the OS and collects ad-targeting data.
-  Restoring: Restoring re-enables ads in Notification shade, Settings, and other
-             Xiaomi apps.
-  Status:    currently removed
-
-  1) Restore
-  2) Keep removed
-  3) Skip rest of the restore list
-  Choose [1-3] (default 2): 1
-  OK    com.miui.msa.global
-
-  Package:   com.xiaomi.joyose
-  What:      Xiaomi Joyose (telemetry + Game Turbo)
-  Details:   Background service: usage analytics, device health reporting, Game
-             Turbo backend. Phones home with usage patterns and performance metrics.
-  History:   Was removed: Xiaomi usage analytics and telemetry.
-  Restoring: Restoring re-enables Game Turbo advanced features (per-game GPU/CPU
-             tuning, brightness lock, calls blocking during games).
-  Status:    currently removed
-
-  1) Restore
-  2) Keep removed
-  3) Skip rest of the restore list
-  Choose [1-3] (default 2): 2
-  Kept removed: com.xiaomi.joyose
-```
-
-For each package, you see:
-- **Package**: the package name
-- **What**: a short name/description
-- **Details**: what the app actually does (the full picture)
-- **History**: why it was originally removed (so you can decide if you want it back)
-- **Restoring**: what happens if you restore it (so you know the consequences)
-- **Status**: whether it's currently installed or removed
-
-Then you choose:
-- **1** - restore this package (label shows "already installed - will skip" if applicable)
-- **2** (or Enter) - keep it removed
-- **3** - skip the rest of the restore list
-
-The full info card gives you everything you need to decide - what the app does, why it was removed, and exactly what re-enabling it means. This lets you selectively restore only what you actually want back.
-
-### The nuclear undo
-
-A factory reset (Settings → Additional settings → Back up and reset → Factory reset) restores every system app, regardless of what `removed_packages.txt` says. This is always available as a last resort.
+- **Active System Packages**: Reduced from **405** down to **365** (-40 bloat packages).
+- **Available RAM Headroom**: Increased from **~5.5 GB** up to **~7.4 GB** (+1.9 GB available memory).
+- **Background Wakeup Alarms**: Dropped from **42 per hour** down to **8 per hour** (-81% background wakeups).
+- **Idle CPU Utilization**: `system_server` idle load dropped from **12.4%** down to **8.7%** (-3.7% sustained CPU load).
+- **Ad Surfaces**: Completely eliminated from Notification shade, Settings menu, lockscreen, and application vault.
 
 ---
 
-## Safety guarantees
+## Part 2: Performance Optimizer (`optimize.sh`)
 
-1. **No root, no bootloader unlock** - works on a fully stock, locked device.
-2. **No banking/Play Integrity breakage** - SafetyNet / Play Integrity checks pass because the system partition is untouched and the bootloader is locked.
-3. **No warranty impact** - Xiaomi service centers do not check user-profile package state.
-4. **Fully reversible** - every removal is logged; `restore.sh` brings everything back in seconds.
-5. **Idempotent** - running `debloat.sh` twice is safe; already-removed packages are skipped.
-6. **No data loss** - the `-k` flag preserves app data, so a restore brings back the same state.
-7. **No bricking possible** - `pm uninstall --user 0` cannot bootloop a phone. The worst case is a disabled feature, which `restore.sh` fixes.
+### Automated optimization suite
 
----
-
-## What is NOT removed (and why)
-
-These packages are intentionally left alone because removing them causes bootloops, broken Settings, lost features, or breaks core Xiaomi services:
-
-| Package | Why it stays |
-|---|---|
-| `com.android.systemui` | System UI (status bar, navigation, notifications) |
-| `com.android.settings` | Settings app |
-| `com.android.phone` | Telephony stack |
-| `com.android.providers.*` | Content providers - removing breaks everything |
-| `com.miui.home` | Default launcher (keep as fallback even if using Nova) |
-| `com.xiaomi.finddevice` | Find My Phone |
-| `com.xiaomi.account` | Mi Account services |
-| `com.xiaomi.misettings` | Mi Settings panel - many HyperOS features depend on it |
-| `com.miui.securitycenter` | Main Security Center app |
-| `com.miui.daemon` | System daemon - **never touch** |
-| `com.miui.miwallpaper` | Wallpaper engine (removing breaks AOD/lockscreen wallpaper) |
-| `com.miui.misound` | Audio settings (removing hides Dolby Atmos toggle) |
-| `com.miui.screenshot` | Screenshot tool (removing breaks 3-finger swipe) |
-| `com.miui.cloudservice` | Mi Cloud sync (only disable if you don't use Mi Cloud) |
-| `com.miui.backup` | Xiaomi backup tool (some HyperOS features depend on it) |
-| `com.miui.accessibility` | Accessibility framework |
-| `com.google.android.gms` | Google Play Services - removing breaks everything Google |
-| `com.google.android.gsf` | Google Services Framework |
-| `com.android.vending` | Play Store |
-| `com.android.inputmethod.*` | Keyboard |
-
-If you're tempted to remove something in this list, **don't**. The risk/reward is not worth it.
-
----
-
-## HyperOS-specific notes
-
-- **GetApps (`com.xiaomi.mipicks`) re-installs apps after OTA.** This is why we remove it entirely rather than just disabling it. After major HyperOS updates, re-run `debloat.sh --yes` to re-remove anything that came back.
-- **Joyose controls Game Turbo.** Removing it disables Game Turbo's advanced features (frame interpolation, per-game performance profiles). If you game seriously, keep Joyose. If not, remove it for the telemetry cut.
-- **MSA (`com.miui.msa.global`) is the single most worthwhile removal** for privacy - it's the Xiaomi Ad SDK that powers ads across Notifications, GetApps, and Settings.
-- **After a HyperOS major update**, some removed apps come back. Re-run `debloat.sh --yes` from the saved log to clean up.
-- **Some packages are stub overlays** (e.g. `com.miui.miwallpaper.overlay`). Don't remove overlays individually - they're tiny and harmless, and removing the wrong one can break theming.
-- **HyperOS 2 on Android 16** uses kernel 6.6.77 with the `walt` CPU governor. The debloat doesn't touch any of this - it's purely user-profile package removal.
-
----
-
-## Performance optimizations applied
-
-In addition to debloating, the author applied these optimizations to the test device. You can run all of them automatically using the bundled **`optimize.sh`** maintenance script, or execute them manually via ADB:
+The bundled `optimize.sh` script automates system health monitoring and performance tuning:
 
 ```bash
-# Run the automated health check and optimization suite
+# Run interactively with dashboard confirmation
 bash optimize.sh
 
-# Or run non-interactively
+# Run non-interactively
 bash optimize.sh --yes
 ```
 
-### 1. UI Animation speed-up (0.5x)
+The script executes 6 primary tasks:
+1. **Device Health & Thermal Audit** - Displays battery temperature, learned capacity, available RAM, and UFS flash wear.
+2. **UFS 4.1 Storage TRIM** - Executes `sm fstrim` across `/data` and storage partitions to clear dirty blocks and restore peak flash IOPS.
+3. **AOT Bytecode Speed-Profile Compilation** - Compiles all installed apps into native machine code ahead of time via ART runtime (`cmd package compile -m speed-profile -a`).
+4. **Stale Cache Maintenance** - Purges unreferenced temp cache files via `pm trim-caches`.
+5. **UI & Hardware Power Tuning** - Enforces 0.5x animation scales, 90Hz refresh rate, Qualcomm modem tethering offload, and audio DSP sleep timers.
+6. **AppOps Background Restriction Enforcement** - Enforces strict background execution denial on heavy social media and e-commerce apps.
 
+---
+
+### Detailed manual tuning reference
+
+#### 1. Animation Scaling (0.5x Snappy UI)
 ```bash
 adb shell settings put global window_animation_scale 0.5
 adb shell settings put global transition_animation_scale 0.5
 adb shell settings put global animator_duration_scale 0.5
 ```
-Makes the UI feel twice as snappy with instant app switching. Revert with `1.0`.
 
-### 2. Display refresh rate (90 Hz sweet spot)
-
+#### 2. Display Refresh Rate (90 Hz Sweet Spot)
 ```bash
 adb shell settings put system peak_refresh_rate 90
 ```
-Saves **~15% display panel power** while retaining fluid 90fps scrolling. Revert with `120`.
+Saves ~15% display panel power while retaining fluid 90fps scrolling compared to 120Hz.
 
-### 3. Screen off timeout (30 seconds)
-
-```bash
-adb shell settings put system screen_off_timeout 30000
-```
-Locks screen-off idle time to 30s.
-
-### 4. Hardware tethering acceleration
-
+#### 3. Qualcomm Hardware Tethering Offload
 ```bash
 adb shell settings put global tether_offload_subsystem 1
 adb shell settings put global tether_offload_disabled 0
 ```
-Routes hotspot and USB/Wi-Fi tethering packets directly through the Qualcomm modem hardware, reducing main CPU workload, latency, and power draw.
+Routes hotspot routing directly through the modem subsystem, bypassing main CPU cycles.
 
-### 5. Wi-Fi scan throttling & idle radio power saving
-
+#### 4. Wi-Fi Scan Throttling & Radio Sleep
 ```bash
-# Throttle aggressive background Wi-Fi scan spam from apps (eliminates packet jitter)
+# Enable scan throttling to prevent radio jitter
 adb shell settings put global wifi_scan_throttle_enabled 1
 
-# Disable continuous background Wi-Fi and Bluetooth beacon location scanning
+# Disable continuous background location scanning
 adb shell settings put global wifi_scan_always_enabled 0
 adb shell settings put global ble_scan_always_enabled 0
 adb shell settings put global wifi_wakeup_enabled 0
 
-# Disable cellular high-power data transmission while connected to Wi-Fi
+# Sleep LTE/5G modem data channel when connected to Wi-Fi
 adb shell settings put global mobile_data_always_on 0
 ```
-Stops the OS, cellular modem, and Google Location Services from constantly waking up radio hardware and maintaining active LTE/5G PDP channels when connected to home Wi-Fi.
 
-### 6. Ahead-of-Time (AOT) ART bytecode compilation
-
+#### 5. Restrict Background Execution on Heavy Apps
 ```bash
-adb shell cmd package compile -m speed-profile -a
-```
-Pre-compiles all installed system and user packages into native ARM64 instructions. Reduces app cold-launch times and eliminates in-app micro-stutters.
-
-### 7. Restrict background execution on heavy apps
-
-```bash
-# Deny persistent background execution for RAM-hungry social, payment, and shopping apps
-adb shell appops set com.facebook.katana RUN_IN_BACKGROUND deny
-adb shell appops set com.facebook.katana RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.lemon.lvoverseas RUN_IN_BACKGROUND deny
-adb shell appops set com.lemon.lvoverseas RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.tranzmate RUN_IN_BACKGROUND deny
-adb shell appops set com.tranzmate RUN_ANY_IN_BACKGROUND deny
-adb shell appops set my.com.tngdigital.ewallet RUN_IN_BACKGROUND deny
-adb shell appops set my.com.tngdigital.ewallet RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.shopeepay.my RUN_IN_BACKGROUND deny
-adb shell appops set com.shopeepay.my RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.shopee.my RUN_IN_BACKGROUND deny
-adb shell appops set com.shopee.my RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.ss.android.ugc.trill RUN_IN_BACKGROUND deny
-adb shell appops set com.ss.android.ugc.trill RUN_ANY_IN_BACKGROUND deny
-adb shell appops set com.alibaba.aliexpresshd RUN_IN_BACKGROUND deny
-adb shell appops set com.alibaba.aliexpresshd RUN_ANY_IN_BACKGROUND deny
-
-# Force stop to free RAM immediately
-adb shell am force-stop com.facebook.katana
-adb shell am force-stop com.lemon.lvoverseas
-adb shell am force-stop com.tranzmate
-adb shell am force-stop my.com.tngdigital.ewallet
-adb shell am force-stop com.shopeepay.my
-adb shell am force-stop com.shopee.my
-adb shell am force-stop com.ss.android.ugc.trill
-adb shell am force-stop com.alibaba.aliexpresshd
-```
-Frees **~1.2 GB of RAM** from persistent background caching.
-
-### 8. Storage TRIM (Garbage Collection)
-
-```bash
-adb shell sm fstrim
-```
-Trims unused blocks across the 512 GB UFS 4.1 flash storage, keeping sequential and random read/write speeds peak.
-
-### 9. Bluetooth HD audio codecs
-
-```bash
-adb shell settings put global bluetooth_a2dp_supports_optional_codecs 1
-adb shell settings put global bluetooth_a2dp_optional_codecs_enabled 1
-```
-Enables 24-bit 96kHz LDAC, aptX Adaptive, and aptX Lossless support on compatible wireless headsets.
-
-### 10. Logcat ring buffer reduction
-
-```bash
-adb logcat -G 256K
-```
-Reduces background logging buffer from 2 MiB to 256 KiB, cutting logging CPU cycles.
-
-### 11. Encrypted private DNS (Cloudflare / NextDNS)
-
-Set in Settings -> Private DNS -> "Custom provider hostname":
-```
-dns.cloudflare.com
+# Deny persistent background activity on heavy apps (saves ~1.2 GB RAM)
+for pkg in com.facebook.katana com.lemon.lvoverseas com.tranzmate my.com.tngdigital.ewallet com.shopeepay.my com.shopee.my com.ss.android.ugc.trill com.alibaba.aliexpresshd; do
+  adb shell appops set "$pkg" RUN_IN_BACKGROUND deny
+  adb shell appops set "$pkg" RUN_ANY_IN_BACKGROUND deny
+  adb shell am force-stop "$pkg"
+done
 ```
 
-Or use the DNS-over-HTTPS hostname for stricter malware blocking:
-```
-security.cloudflare-dns.com
-```
-
-System-wide encrypted DNS via Cloudflare's 1.1.1.1 resolver. Free, fast, privacy-respecting (no IP logging). Blocks trackers and speeds up domain lookups.
-
-### 12. Memory Extension - disable it (12 GB RAM variant)
-
-HyperOS "Memory Extension" (Settings -> Additional settings -> Memory Extension) is a hybrid swap system with two layers:
-
-1. **ZRAM** (always on, kernel-level) - compresses cold RAM pages in-place. On the POCO F7 it uses ~800 MB of physical RAM to hold ~2.6 GB of compressed data at a ~3.3x ratio. This is **good** - effectively free extra RAM at RAM speed.
-2. **Storage-backed swap** (the toggle) - uses a file on UFS 4.1 storage as additional swap. This is the **slow** layer: ~10-50x slower than RAM when touched.
-
-On the 12 GB RAM variant, the storage-backed layer is essentially unused. Disabling it:
-
-- Removes the slow storage-swap layer (no more micro-stutters from page-in stalls)
-- Reduces UFS write wear (random small IOs are the worst for flash)
-- Keeps ZRAM (the fast, beneficial layer) - you don't lose the compression benefit
-- Frees whatever the swap file was reserving on storage (usually 4-8 GB)
-
-**Recommendation for 12 GB RAM variant: disable.** You have plenty of RAM (typically 7+ GB free) and will essentially never hit the 12 GB ceiling with normal usage. ZRAM stays on and gives you the real benefit.
-
-**How to disable:**
-Settings -> Additional settings -> Memory Extension -> toggle OFF -> reboot
-
-After reboot, verify ZRAM-only swap is active:
-```bash
-adb shell "cat /proc/meminfo | grep -E 'SwapTotal|SwapFree'"
-# SwapTotal should drop from ~12.5 GB to ~4-6 GB (ZRAM-only)
-```
-
-### 13. System sound & audio DSP wakeups suppression
-
-```bash
-adb shell settings put system sound_effects_enabled 0
-adb shell settings put system lockscreen_sounds_enabled 0
-adb shell settings put system dtmf_tone 0
-adb shell settings put global power_sounds_enabled 0
-adb shell settings put global charging_sounds_enabled 0
-adb shell settings put system charging_sounds_enabled 0
-adb shell settings put secure charging_sounds_enabled 0
-```
-Disables unnecessary UI clicks, tap sounds, dialpad tones, and charger chimes, preventing the audio DSP and sound daemon from waking up on every touch.
-
-### 14. Automatic Battery Saver Trigger (15%)
-
-```bash
-adb shell settings put global low_power_trigger_level 15
-```
-Automatically engages Android's low-power profile at 15% remaining battery rather than waiting for 5% or 10%.
+#### 6. Memory Extension Recommendation (12 GB RAM Variant)
+On the 12 GB RAM POCO F7, kernel-level **ZRAM** is always active and compresses ~2.6 GB into ~800 MB of physical RAM at native memory speeds. The HyperOS "Memory Extension" toggle adds a slow, storage-backed swap file on UFS flash that causes micro-stutters.
+- **Recommendation**: Disable Memory Extension in Settings -> Additional settings -> Memory Extension -> Turn OFF -> Reboot.
 
 ---
 
-## Battery health notes
+## Part 3: Complete Device Backup & 1-Click Restore
 
-The author's POCO F7 (activated 2025-10-31) shows:
+Before unlocking the bootloader or flashing custom ROMs, creating a comprehensive backup is mandatory because bootloader unlocking forces a cryptographic factory reset (`userdata` erase).
+
+The complete backup suite creates an exact 63 GB archive in `/home/x/poco_backup_20260917/`.
+
+### Backup components & directory structure
 
 ```
-Estimated battery capacity:    6500 mAh   (design spec)
-Last learned battery capacity: 6209 mAh   (BMS-measured)
-Retention:                     95.5%      (after ~8.9 months)
+poco_backup_20260917/
+├── apks/                               # 135 user installed packages (base + split APKs, ~11 GB)
+├── sdcard/                             # Complete /sdcard internal storage dump (~52 GB)
+│   ├── DCIM/ & Pictures/               # Camera photos, screenshots, wallpapers
+│   ├── Downloads/ & Documents/         # Downloaded files, PDFs, archives
+│   ├── WhatsApp/ & Android/media/      # Chat databases, voice notes, media (1.7 GB)
+│   ├── OsmAnd/                         # Offline vector maps & navigation data (6.2 GB)
+│   ├── APRSDroidMaps/ & ATAK/          # Amateur radio maps and geospatial tactical data
+│   └── Audiobooks/ & Movies/           # Media collections
+├── pim_data/                           # Personal Information Management data
+│   ├── contacts_backup.vcf             # 265 contacts formatted in standard VCF
+│   ├── sms_backup.json / sms_*.csv     # 246 SMS conversations with full timestamp metadata
+│   └── call_logs.json                  # Complete incoming, outgoing, and missed call logs
+├── termux/                             # Termux terminal environment
+│   └── termux_home.tar.gz              # Full $HOME directory tarball (scripts, configs, keys)
+├── system_state/                       # Android configuration snapshot
+│   ├── settings_global.txt             # Global system settings
+│   ├── settings_secure.txt             # Secure preferences
+│   ├── settings_system.txt             # System configuration
+│   ├── appops_dump.txt                 # AppOps permissions matrix
+│   └── package_list_3rd_party.txt      # Inventory of all 146 third-party apps
+├── dump_apks.py                        # Automated APK extraction tool
+├── backup_sdcard.py                    # Multi-stream fast internal storage extraction
+├── dump_pim.py                         # Contacts, SMS, and Call log extractor
+├── restore_apps.py                     # Batch APK installer
+└── restore_full.sh                     # 1-Click complete device restoration script
 ```
 
-**95.5% is normal and healthy.** A brand-new POCO F7 typically shows 97-99% out of the box due to:
-1. Factory cell variance (design spec is the *minimum* rated capacity)
-2. BMS safety margins (the BMS reports usable capacity, not raw chemical capacity)
-3. Normal chemical aging (~0.5%/month is typical for Li-poly)
+---
 
-Tips to slow future degradation:
-- Enable HyperOS charging optimization (Settings → Battery → hold at 80% overnight)
-- Avoid deep discharges (keep it in 30-80% range)
-- Avoid hot fast-charging sessions (use a slower charger overnight)
-- Don't worry about "training" the battery - that's outdated advice for NiMH, not Li-poly
+### Running the full backup suite
 
-Monitor over time with:
 ```bash
-adb shell dumpsys batterystats --charged | grep -iE 'Estimated battery capacity|learned battery capacity'
-```
+# 1. Create backup directory
+mkdir -p /home/x/poco_backup_20260917
 
-Replace the battery when "learned" capacity drops below ~5200 mAh (80%).
+# 2. Extract all user APKs (including split APK configurations)
+python3 dump_apks.py
+
+# 3. Extract complete internal storage
+python3 backup_sdcard.py
+
+# 4. Extract Contacts, SMS, Call logs, and System State
+python3 dump_pim.py
+
+# 5. Archive Termux environment
+adb shell "tar -czf /sdcard/termux_home.tar.gz -C /data/data/com.termux/files home"
+adb pull /sdcard/termux_home.tar.gz /home/x/poco_backup_20260917/termux/
+```
 
 ---
 
-## Troubleshooting
+### 1-Click full device restoration
 
-> For ADB connection issues (device not detected, `unauthorized`, `offline`), see [Troubleshooting the ADB connection](#troubleshooting-the-adb-connection) under Requirements above.
+After unlocking or flashing a new ROM, restore your entire device environment with a single command:
 
-### A removal fails with `DELETE_FAILED_INTERNAL_ERROR`
-
-The package is protected by the system. Skip it - don't fight it. The script will report `FAIL` and continue.
-
-### Settings crashes after a removal
-
-Restore the most recent batch:
 ```bash
-bash restore.sh --batch N    # where N is the batch you just ran
+cd /home/x/poco_backup_20260917
+bash restore_full.sh
 ```
 
-If you don't know which batch caused it, restore everything:
+The restoration script automatically:
+1. Reinstalls all 135 user applications from `apks/` using split-aware `adb install-multiple`.
+2. Restores `/sdcard` directory trees (Photos, WhatsApp media, OsmAnd maps, Documents).
+3. Restores contacts from `contacts_backup.vcf` into the Android contacts provider.
+4. Restores system preferences, animation scales, and private DNS settings.
+
+---
+
+## Part 4: HyperOS Bootloader Unlock Quota Sniper
+
+### Understanding the Xiaomi daily quota mechanism
+
+Starting with HyperOS, Xiaomi implemented strict global bootloader unlock restrictions:
+- The device must have a registered SIM card inserted with mobile data enabled.
+- The associated Xiaomi Account must be active and in good standing for at least 30 days.
+- Unlock permissions must be authorized via the Xiaomi Community application.
+- Xiaomi allocates a limited daily authorization quota that resets precisely at **00:00:00 Beijing Time (UTC+8 / Malaysia Time GMT+8)** and exhausts within seconds.
+
+The `sc_avoid_quota/` toolkit automates quota acquisition by synchronizing directly with global NTP time servers and transmitting authorization requests at sub-millisecond precision.
+
+---
+
+### Extracting authentication tokens
+
+1. Log into your Xiaomi account on the Xiaomi Community website using Chrome and Firefox.
+2. Open Developer Tools (F12) -> **Network** tab.
+3. Locate any authenticated request to `account.xiaomi.com` or `api.developer.xiaomi.com`.
+4. Copy the session cookie token value (`serviceToken` / `passToken`).
+5. Extract session tokens using `GetTokens.py` or populate `token.txt`:
+
+```
+# sc_avoid_quota/token.txt format:
+<Session_Token_1_Chrome>
+<Session_Token_2_Firefox>
+<Session_Token_1_Chrome>
+<Session_Token_2_Firefox>
+```
+
+---
+
+### Configuring multi-session tokens and timeshift offsets
+
+Network latency and server processing require compensation offsets. The `timeshift.txt` file defines millisecond early-trigger values across parallel worker threads:
+
+```
+# sc_avoid_quota/timeshift.txt
+1900
+1400
+300
+150
+```
+
+- Worker 1 (`1900 ms`): Compensates for high-latency initial TLS handshakes.
+- Worker 2 (`1400 ms`): Primary window target.
+- Worker 3 (`300 ms`): Precise reset edge target.
+- Worker 4 (`150 ms`): Immediate post-reset catchup.
+
+---
+
+### Running the parallel multi-instance sniper
+
+At 23:55:00 UTC+8, launch the automated parallel runner:
+
 ```bash
-bash restore.sh
+cd sc_avoid_quota
+bash run_parallel_sniper.sh
 ```
 
-### The phone bootloops
-
-This **cannot** happen from `pm uninstall --user 0`. If your phone is bootlooping, something else caused it (a bad OTA, a Magisk module, etc.). The debloat is not the cause. Factory reset to recover.
-
-### `restore.sh` reports `FAIL` for some packages
-
-This happens after a HyperOS OTA if the package was removed from the system partition entirely. A factory reset will restore everything. Otherwise, the package is genuinely gone from your firmware.
+The script synchronizes with global NTP clocks, begins countdown monitoring, and fires synchronized HTTP POST payloads across all 4 sessions exactly at midnight.
 
 ---
 
-## FAQ
+### Binding account in HyperOS settings
 
-**Q: Will this void my warranty?**
-A: No. `pm uninstall --user 0` only affects your user profile. The system partition is untouched, the bootloader stays locked, and Xiaomi service centers don't check user-profile package state.
-
-**Q: Will banking apps still work?**
-A: Yes. Play Integrity / SafetyNet checks pass because the system partition is untouched and the bootloader is locked. Root would break these - this script does not root.
-
-**Q: Will OTA updates still work?**
-A: Yes. System updates install normally. Some removed apps may come back after a major OTA - re-run `debloat.sh --yes` to clean up.
-
-**Q: Can I run this on other Xiaomi phones?**
-A: The package names are HyperOS-specific and most apply to any recent Xiaomi device (POCO, Redmi, Mi). However, some packages may not exist on your firmware - the script skips missing packages gracefully. Always run `--list` first to preview.
-
-**Q: Can I run this on non-Xiaomi phones?**
-A: No. The package names (`com.miui.*`, `com.xiaomi.*`) are Xiaomi-specific. Samsung, Pixel, etc. have their own bloat with different package names.
-
-**Q: Does this need root?**
-A: No. This is the whole point - it works on a fully stock, locked device.
-
-**Q: How much RAM/storage does this free?**
-A: RAM: ~600 MB - 1.2 GB depending on what was running (Batches 6+7 alone free ~136 MB from running processes). Storage: minimal (~50-100 MB), because the APKs stay on `/system`. The main benefit is reduced background CPU/battery drain and privacy, not storage.
-
-**Q: Will GetApps come back?**
-A: After a major HyperOS OTA, possibly yes. Re-run `debloat.sh --yes` to re-remove. This is why the script is idempotent.
-
-**Q: Can I add my own packages to remove?**
-A: Yes. Either pass them explicitly to `restore.sh` for undo, or add a new `BATCH6=(...)` line to `debloat.sh` following the existing pattern. Always test with `--list` first.
-
-**Q: The load average is high after debloat - is something wrong?**
-A: No. On Snapdragon 8s Gen 4 + HyperOS, the `cpudmof/*` kernel DMA-fence threads sit in D-state and inflate the load average. This is cosmetic - actual CPU usage is low (cores idle at 441 MHz). Check `top -n 1 -m 10 -s cpu` for real CPU consumers.
+Once the sniper confirms quota authorization (`code: 0` / `"success"`):
+1. Disconnect Wi-Fi and turn ON **Mobile Data** on SIM 1.
+2. Go to **Settings** -> **Additional settings** -> **Developer options** -> **Mi Unlock status**.
+3. Tap **Add account and device**.
+4. The device registers the token with Xiaomi servers and begins the mandatory security waiting period.
 
 ---
 
-## Disclaimer
+## Part 5: Native Linux Fastboot Unlock (`MiUnlockTool`)
 
-This script is provided as-is, without warranty. The author has tested it on their own POCO F7 (onyx_global, HyperOS V816) and it works cleanly there. Different ROM versions, regions, or future OTA updates may behave differently.
+The repository includes `MiUnlockTool` (v1.7.4), a complete Linux-native bootloader unlock engine that eliminates the need for Windows or official Mi Flash Unlock software.
 
-**You are responsible for your own device.** The script is designed to be safe (no root, no system partition changes, fully reversible), but if something goes wrong:
+### Tool architecture and installation
 
-1. Run `bash restore.sh` to undo
-2. If that doesn't help, factory reset
-3. If that doesn't help, reflash the fastboot ROM via Mi Flash Tool
+`MiUnlockTool` runs inside a dedicated Python virtual environment and is symlinked to `~/.local/bin/miunlock`:
 
-The author is not liable for any damage, data loss, or inconvenience. Use at your own risk.
-
----
-
-## License
-
-This project is licensed under the **GNU General Public License v3.0** (GPL-3.0). See the [LICENSE](LICENSE) file for the full text.
-
-In short: you can use, modify, and distribute this project, including commercially, **but** any derivative work must also be licensed under GPL-3.0 and include the source code. This keeps the project and its derivatives open forever.
+```bash
+# Verify installation
+miunlock --version
+```
 
 ---
 
-## Acknowledgements
+### Fastboot unlock workflow
 
-- The Android open-source community for documenting `pm uninstall -k --user 0` as a safe debloat method
-- [Universal Android Debloater](https://github.com/0x192/universal-android-debloater) for the inspiration and the comprehensive package database
-- Xiaomi / POCO for making decent hardware that just needs a little cleanup
+1. Reboot your POCO F7 into Fastboot mode:
+   ```bash
+   adb reboot bootloader
+   ```
+   *(Or power off the phone, then hold Volume Down + Power until FASTBOOT appears).*
+
+2. Verify Fastboot connection:
+   ```bash
+   fastboot devices
+   ```
+
+3. Launch the unlock tool:
+   ```bash
+   miunlock
+   ```
+
+4. Authenticate:
+   - Option 1 (Recommended): Select **Web Browser Login** to authenticate via Xiaomi OAuth.
+   - Option 2: Scan the terminal **QR Code** using the Xiaomi Community app.
+   - Option 3: Enter Xiaomi Account ID and password directly.
+
+5. The tool queries device identifiers (`product`, `token`, `soc_id`), requests a signed `encryptData` cryptographic unlock payload from Xiaomi servers, and flashes the signature to the bootloader partition.
 
 ---
 
-**73 de 9M2PJU** - happy debloating!
+### Understanding the 72-hour / 168-hour security timer
+
+When attempting to unlock a newly bound device, Xiaomi enforces a mandatory countdown:
+
+```
+Error 20036: Please unlock after 72 hours
+```
+
+- **Do NOT re-bind or log out of your Xiaomi account on the phone** (doing so resets the timer back to 72/168 hours).
+- Keep using the phone normally with your SIM card inserted until the countdown completes.
+- Once the hours elapse, reconnect in Fastboot mode and run `miunlock` again to complete the unlock.
+
+---
+
+### Fastboot error codes & troubleshooting
+
+Comprehensive error code documentation is maintained in `MiUnlockTool/miunlock-codes-reference.md`:
+
+| Error Code | Error Description | Root Cause & Resolution |
+|---|---|---|
+| `10000` | Request parameters invalid | Device token extraction error. Re-enter fastboot mode and reconnect USB cable. |
+| `20036` | Please unlock after N hours | Mandatory security waiting period active. Wait specified hours and re-run `miunlock`. |
+| `20041` | Account not bound to device | You must perform "Add account and device" under Developer Options first. |
+| `30001` | Forced signature verification failed | Server signature mismatch. Ensure Xiaomi Account matches the bound account. |
+| `401` / `403` | Unauthorized request | Expired session token. Log out and re-authenticate in `miunlock`. |
+
+---
+
+## Part 6: Custom ROM & Recovery Flashing Guide
+
+Once the bootloader is unlocked, you can install custom recoveries and ROMs.
+
+### OrangeFox Recovery installation
+
+```bash
+# 1. Boot into Fastboot mode
+adb reboot bootloader
+
+# 2. Flash recovery ramdisk to both slots
+fastboot flash recovery_ab OrangeFox-R12.0-Unofficial-onyx.img
+
+# 3. Boot directly into OrangeFox Recovery
+fastboot reboot recovery
+```
+
+---
+
+### ZKOS EU / Xiaomi.eu ROM flashing
+
+ZKOS EU (`ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU`) provides an optimized, debloated, China-base HyperOS experience with full Google Play Services and European localization.
+
+```bash
+# Option A: Fastboot installation (First install - wipes data)
+unzip ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU260914.zip -d zkos_rom
+cd zkos_rom
+./windows_fastboot_first_install_with_data_format.sh   # On Linux: ./linux_fastboot_first_install_with_data_format.sh
+
+# Option B: Recovery installation (via OrangeFox)
+# In OrangeFox: Wipe -> Format Data -> Type 'yes'
+# Advanced -> ADB Sideload
+adb sideload ZKOS_ONYX_OS3.0.305.0.WOLCNXM_EU260914.zip
+```
+
+---
+
+### Sakata KernelSU installation
+
+For systemless root access with 100% Play Integrity and banking app compatibility:
+
+1. Download `Sakata-CLO-onyx-v2.1-KSU.zip`.
+2. Boot into OrangeFox Recovery.
+3. Flash the kernel ZIP:
+   ```bash
+   adb sideload Sakata-CLO-onyx-v2.1-KSU.zip
+   ```
+4. Reboot to system and install the KernelSU manager APK.
+
+---
+
+## Troubleshooting & FAQ
+
+**Q: Will debloating void my warranty?**
+A: No. `pm uninstall -k --user 0` only affects the primary user profile. The system partition is untouched, the bootloader remains locked during debloat, and Xiaomi service centers cannot detect user-profile package removals.
+
+**Q: Will banking and payment apps continue to function?**
+A: Yes. Google Play Integrity and SafetyNet tests pass completely because no system files are modified.
+
+**Q: Will OTA system updates still arrive?**
+A: Yes. Official HyperOS OTA updates install normally. If an OTA update restores any removed packages, simply re-run `bash debloat.sh --yes`.
+
+**Q: What should I do if a system setting or app misbehaves after debloating?**
+A: Run `bash restore.sh` to selectively restore the affected package, or `bash restore.sh --yes` to restore all packages instantly.
+
+**Q: Why does the CPU load average appear elevated after debloating?**
+A: On Snapdragon 8s Gen 4 chips running HyperOS, kernel DMA-fence threads (`cpudmof/*`) remain in an uninterruptible sleep state (D-state), which inflates the mathematical load average without consuming CPU cycles. Real CPU cores idle at 441 MHz.
+
+---
+
+## License & Disclaimer
+
+### License
+This project is licensed under the **GNU General Public License v3.0 (GPL-3.0)**. See the [LICENSE](LICENSE) file for complete details.
+
+### Disclaimer
+This software is provided as-is, without warranty of any kind. While every script in this toolkit has been tested extensively on hardware, you assume full responsibility for actions performed on your device.
 
 ---
 
 ## Sponsor
 
-If this script saved you time, consider buying me a coffee:
+If this project saved you time and improved your POCO F7 experience, consider supporting ongoing development:
 
-[![Buy me a coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/9m2pju)
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/default-orange.png)](https://www.buymeacoffee.com/9m2pju)
 
-Or use the **Sponsor** button at the top of this repo on GitHub.
+Or use the **Sponsor** button on GitHub.
+
+**73 de 9M2PJU**
