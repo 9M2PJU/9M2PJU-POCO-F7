@@ -1,0 +1,35 @@
+[project]
+version = "1.7.4"
+name = "miunlock"
+description = "Retrieve Xiaomi encryptData(token) to unlock bootloader"
+authors = [{name = "offici5l"}]
+license = "Apache-2.0"
+
+keywords = ["xiaomi", "miunlock", "MiUnlockTool", "bootloader", "unlock", "MIUI", "HyperOS", "Tools"]
+
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+requires-python = ">=3.7"
+
+dependencies = [
+    "migate >= 1.1.11",
+    "pyaes",
+]
+
+[project.urls]
+Repository = "https://github.com/MiForge/MiUnlockTool"
+
+[project.scripts]
+miunlock = "miunlock.cli:main"
+
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -25,6 +25,15 @@ AGENTS.md
 *.bak
 *.tmp
 *.apk
+*.zip
+*.7z
 backup/apks/
 backup/*2026-09-16*
 .env
+token.txt
+*token*.txt
+firmware/
+venv/
+**/venv/
+__pycache__/
+**/__pycache__/
